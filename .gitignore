@@ -5,3 +5,6 @@ __pycache__/
 .vercel
 vtu_platform.db
 *.log
+
+.vercel
+.env*
