@@ -6,7 +6,8 @@ from flask import (
     url_for,
     session,
     jsonify,
-    flash
+    flash,
+    send_from_directory
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
@@ -21,11 +22,32 @@ from dotenv import load_dotenv
 load_dotenv()
 from vtu_data import init_vtu_db, calculate_student_gpa, seed_sample_student_data, DATABASE
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+TEMPLATES_DIR = os.path.join(BASE_DIR, "templates")
+
+app = Flask(
+    __name__,
+    static_folder=STATIC_DIR,
+    static_url_path="/static",
+    template_folder=TEMPLATES_DIR
+)
 app.secret_key = os.environ.get(
     "SECRET_KEY",
     "eduspark-vtu-academic-learning-secret-key-2026"
 )
+
+@app.route('/static/<path:filename>')
+def serve_static_file(filename):
+    return send_from_directory(app.static_folder, filename)
+
+@app.route('/styles.css')
+def serve_root_styles():
+    return send_from_directory(app.static_folder, 'styles.css')
+
+@app.route('/script.js')
+def serve_root_script():
+    return send_from_directory(app.static_folder, 'script.js')
 
 def get_db():
     conn = sqlite3.connect(DATABASE)
