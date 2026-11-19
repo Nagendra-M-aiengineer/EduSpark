@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official VTU Scheme & Syllabus Directory | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .filter-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: flex-end;
+            margin: 24px 0;
+            box-shadow: var(--shadow-sm);
+        }
+        .filter-item {
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-item label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .filter-select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .filter-select:focus {
+            border-color: var(--primary);
+        }
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 20px;
+        }
+        .syllabus-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .syllabus-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+        }
+        .syllabus-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+        .syllabus-actions {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a class="active" href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">{{ user["branch_code"] }} • Sem {{ user["current_sem"] }}</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="welcome-box">
+                <div class="welcome-left">
+                    <div class="vtu-tag">
+                        <i class="fa-solid fa-landmark"></i> VTU OFFICIAL REPOSITORY
+                    </div>
+                    <h1>Official VTU Scheme & Syllabus Engine</h1>
+                    <p>Dynamic curriculum database strictly aligned with official Visvesvaraya Technological University Belagavi notifications. Never generates unverified syllabus data.</p>
+                    <div style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <a href="https://vtucircle.com" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 6px 14px; color: white; border-color: rgba(255,255,255,0.35); text-decoration: none;">
+                            <i class="fa-solid fa-circle-nodes"></i> VTU Circle Notes &amp; Syllabus (vtucircle.com)
+                        </a>
+                        <a href="https://vtuverse.com/sgpa-calculator" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 6px 14px; color: white; border-color: rgba(255,255,255,0.35); text-decoration: none;">
+                            <i class="fa-solid fa-calculator"></i> VTU Verse SGPA Calculator (vtuverse.com)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTER BAR -->
+            <form method="GET" action="{{ url_for('syllabus') }}" class="filter-bar">
+                <div class="filter-item">
+                    <label>Scheme</label>
+                    <select name="scheme" class="filter-select" onchange="this.form.submit()">
+                        {% for s in schemes %}
+                        <option value="{{ s['code'] }}" {% if s['code'] == selected_scheme %}selected{% endif %}>
+                            {{ s['name'] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Branch / Engineering Stream</label>
+                    <select name="branch" class="filter-select" onchange="this.form.submit()">
+                        {% for b in branches %}
+                        <option value="{{ b['code'] }}" {% if b['code'] == selected_branch %}selected{% endif %}>
+                            {{ b['name'] }} ({{ b['short_name'] }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-item" style="max-width: 140px;">
+                    <label>Semester</label>
+                    <select name="sem" class="filter-select" onchange="this.form.submit()">
+                        {% for sm in range(1, 9) %}
+                        <option value="{{ sm }}" {% if sm == selected_sem %}selected{% endif %}>
+                            Semester {{ sm }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-item" style="flex: 2; min-width: 220px;">
+                    <label><i class="fa-solid fa-magnifying-glass"></i> Live Search</label>
+                    <input type="text" id="liveSyllabusSearch" class="filter-select" placeholder="Filter code or title (e.g. BAD601, ML)..." oninput="filterSyllabusRealtime(this.value)">
+                </div>
+                <div style="padding-bottom: 2px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 18px;">
+                        <i class="fa-solid fa-filter"></i> Apply
+                    </button>
+                </div>
+            </form>
+
+            <!-- COURSES GRID -->
+            <div class="courses-grid">
+                {% if courses %}
+                    {% for c in courses %}
+                    <div class="syllabus-card">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                                <span class="syllabus-badge" style="background: rgba(99, 102, 241, 0.12); color: var(--primary);">
+                                    {{ c['course_code'] }}
+                                </span>
+                                <span class="syllabus-badge" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                                    {{ c['credits'] }} Credits
+                                </span>
+                            </div>
+
+                            <h3 style="font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 8px; line-height: 1.4;">
+                                {{ c['course_name'] }}
+                            </h3>
+
+                            <p style="font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.5;">
+                                {{ c['description'] or 'Standard VTU curriculum course component.' }}
+                            </p>
+
+                            <div style="font-size: 12px; color: var(--muted); display: flex; gap: 14px; margin-bottom: 4px;">
+                                <span><i class="fa-solid fa-layer-group" style="color: var(--primary);"></i> <b>{{ c['course_type'] }}</b></span>
+                                <span><i class="fa-solid fa-clock" style="color: #f59e0b;"></i> CIE: {{ c['cie_max'] }} | SEE: {{ c['see_max'] }}</span>
+                            </div>
+                        </div>
+
+                        <div class="syllabus-actions">
+                            <a href="{{ url_for('course_detail', course_id=c['id']) }}" class="btn btn-primary" style="flex: 1; font-size: 13px; justify-content: center; padding: 8px 12px;">
+                                <i class="fa-solid fa-book-open-reader"></i> Learn Subject
+                            </a>
+
+                            <a href="{{ c['vtu_circle_url'] or 'https://vtucircle.com' }}" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 8px 10px;" title="VTU Circle Notes &amp; Syllabus">
+                                <i class="fa-solid fa-circle-nodes"></i> Circle
+                            </a>
+
+                            {% if c['syllabus_url'] %}
+                                <a href="{{ c['syllabus_url'] }}" target="_blank" class="btn btn-outline" style="font-size: 13px; padding: 8px 12px;" title="Source: VTU Official">
+                                    <i class="fa-solid fa-file-pdf"></i> VTU PDF
+                                </a>
+                            {% else %}
+                                <button class="btn btn-outline" style="font-size: 12px; padding: 8px 10px; opacity: 0.6; cursor: not-allowed;" title="Official syllabus link unavailable" disabled>
+                                    <i class="fa-solid fa-link-slash"></i> Unavailable
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="grid-column: 1 / -1; padding: 48px; text-align: center; background: var(--surface); border-radius: var(--radius); border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-book-bookmark" style="font-size: 40px; color: var(--muted); margin-bottom: 12px;"></i>
+                        <h3>No Courses Found</h3>
+                        <p style="color: var(--muted); max-width: 450px; margin: 8px auto;">No courses mapped for <b>{{ selected_scheme }} Scheme - {{ selected_branch }} - Semester {{ selected_sem }}</b>. VTU is updating the course regulations.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function filterSyllabusRealtime(query) {
+            const q = (query || "").trim().toLowerCase();
+            const cards = document.querySelectorAll(".syllabus-card");
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (!q || text.includes(q)) {
+                    card.style.display = "flex";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTU Internship Tracker | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .intern-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        @media (max-width: 992px) {
+            .intern-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .intern-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 28px 0 20px;
+        }
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 18px;
+            left: 20px;
+            right: 20px;
+            height: 3px;
+            background: var(--border);
+            z-index: 1;
+        }
+        .step-item {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+        .step-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+        .step-item.active .step-circle {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+        .step-item.completed .step-circle {
+            border-color: #10b981;
+            background: #10b981;
+            color: white;
+        }
+        .step-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+        .step-item.active .step-title {
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a class="active" href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">{{ user["branch_code"] }} • USN: {{ user["usn"] }}</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="welcome-box">
+                <div class="welcome-left">
+                    <div class="vtu-tag">
+                        <i class="fa-solid fa-briefcase"></i> SEMESTER 7 & 8 VTU REQUIREMENT
+                    </div>
+                    <h1>Mandatory Industry Internship Tracker</h1>
+                    <p>Track your industry or research internship required under VTU CBCS regulations, including offer letter, progress reports, company mentor, and viva-voce evaluation.</p>
+                </div>
+            </div>
+
+            <!-- WORKFLOW PIPELINE -->
+            <div class="intern-card">
+                <h4 style="font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 6px;">
+                    VTU Internship Milestones Progression
+                </h4>
+                <div class="stepper">
+                    <div class="step-item completed">
+                        <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+                        <div class="step-title">Applied</div>
+                    </div>
+                    <div class="step-item completed">
+                        <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+                        <div class="step-title">Selected</div>
+                    </div>
+                    <div class="step-item active">
+                        <div class="step-circle"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                        <div class="step-title">Ongoing</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-circle">4</div>
+                        <div class="step-title">Report Draft</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-circle">5</div>
+                        <div class="step-title">Viva / Completed</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="intern-layout">
+                <!-- FORM -->
+                <div class="intern-card">
+                    <h3 style="font-size: 18px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-file-pen" style="color: var(--primary);"></i> Log / Update Internship
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Provide company & project details.</p>
+
+                    <form method="POST" action="{{ url_for('internships') }}">
+                        <div class="form-group">
+                            <label>Company / Organization *</label>
+                            <input type="text" name="company" class="form-control" placeholder="e.g. Cisco / Bosch / Infosys / Startup" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Domain / Technology Track *</label>
+                            <input type="text" name="domain" class="form-control" placeholder="e.g. AI / Machine Learning / Full Stack" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Internship Type *</label>
+                            <select name="internship_type" class="form-control">
+                                <option value="Industry">Industry Internship</option>
+                                <option value="Research">Research Lab / University</option>
+                                <option value="Rural / Social">Rural / Social Innovation</option>
+                                <option value="Virtual">Virtual / Remote Program</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration *</label>
+                            <input type="text" name="duration" class="form-control" value="8 Weeks" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Start Date</label>
+                            <input type="date" name="start_date" class="form-control" value="2026-06-01">
+                        </div>
+                        <div class="form-group">
+                            <label>End Date</label>
+                            <input type="date" name="end_date" class="form-control" value="2026-07-31">
+                        </div>
+                        <div class="form-group">
+                            <label>Company Mentor / Guide Name</label>
+                            <input type="text" name="mentor_name" class="form-control" placeholder="e.g. Dr. Rajesh Sharma, Staff Engineer">
+                        </div>
+                        <div class="form-group">
+                            <label>Internship Status *</label>
+                            <select name="status" class="form-control">
+                                <option value="Not Started">Not Started</option>
+                                <option value="Applied">Applied</option>
+                                <option value="Selected">Selected</option>
+                                <option value="Ongoing" selected>Ongoing</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Internship Report Status</label>
+                            <select name="report_status" class="form-control">
+                                <option value="Not Started">Not Started</option>
+                                <option value="In Progress" selected>In Progress</option>
+                                <option value="Submitted">Submitted to Department</option>
+                                <option value="Approved">Approved by Guide</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Presentation / Viva Status</label>
+                            <select name="presentation_status" class="form-control">
+                                <option value="Pending" selected>Pending</option>
+                                <option value="Scheduled">Scheduled</option>
+                                <option value="Completed">Completed & Graded</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Internship Record
+                        </button>
+                    </form>
+                </div>
+
+                <!-- RECORDS LIST -->
+                <div>
+                    {% if internships %}
+                        {% for item in internships %}
+                        <div class="intern-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+                                <div>
+                                    <h3 style="font-size: 20px; font-weight: 800; color: var(--text);">{{ item['company'] }}</h3>
+                                    <div style="font-size: 14px; color: var(--primary); font-weight: 700; margin-top: 2px;">
+                                        {{ item['domain'] }} • {{ item['internship_type'] }}
+                                    </div>
+                                </div>
+                                <span style="font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 999px; background: rgba(99, 102, 241, 0.12); color: var(--primary); text-transform: uppercase;">
+                                    {{ item['status'] }}
+                                </span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; background: var(--surface-alt); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                                <div>
+                                    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Duration</div>
+                                    <div style="font-size: 14px; font-weight: 700;">{{ item['duration'] }}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Period</div>
+                                    <div style="font-size: 14px; font-weight: 700;">{{ item['start_date'] }} to {{ item['end_date'] }}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Industry Mentor</div>
+                                    <div style="font-size: 14px; font-weight: 700;">{{ item['mentor_name'] or 'Not Assigned' }}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Project Report</div>
+                                    <div style="font-size: 14px; font-weight: 700; color: #f59e0b;">{{ item['report_status'] }}</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 11px; color: var(--muted); text-transform: uppercase;">Department Viva</div>
+                                    <div style="font-size: 14px; font-weight: 700; color: var(--primary);">{{ item['presentation_status'] }}</div>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <button class="btn btn-outline" style="font-size: 13px; padding: 8px 14px;">
+                                    <i class="fa-solid fa-file-arrow-up"></i> Upload Offer Letter
+                                </button>
+                                <button class="btn btn-outline" style="font-size: 13px; padding: 8px 14px;">
+                                    <i class="fa-solid fa-file-pdf"></i> Upload Final Report
+                                </button>
+                                <button class="btn btn-outline" style="font-size: 13px; padding: 8px 14px;">
+                                    <i class="fa-solid fa-certificate"></i> Upload Completion Certificate
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="intern-card" style="text-align: center; padding: 48px;">
+                            <i class="fa-solid fa-briefcase" style="font-size: 42px; color: var(--muted); margin-bottom: 12px;"></i>
+                            <h3>No Internship Record Logged</h3>
+                            <p style="color: var(--muted); max-width: 450px; margin: 8px auto 20px;">Use the form on the left to record your semester 7/8 internship details, mentor information, and track VTU viva evaluation milestones.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+</body>
+</html>

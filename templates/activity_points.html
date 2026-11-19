@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTU 100 Activity Points Tracker | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .stats-banner {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin: 24px 0;
+        }
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 22px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+        }
+        .stat-details h4 {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-details .num {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .points-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+        }
+        @media (max-width: 992px) {
+            .points-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-card, .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+        .points-progress-bar {
+            height: 12px;
+            background: var(--surface-alt);
+            border-radius: 999px;
+            overflow: hidden;
+            margin: 16px 0;
+            border: 1px solid var(--border);
+        }
+        .points-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), #10b981);
+            border-radius: 999px;
+            transition: width 0.6s ease;
+        }
+
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 12px;
+            margin-top: 18px;
+        }
+        .badge-item {
+            text-align: center;
+            padding: 14px 10px;
+            border-radius: 12px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+        }
+        .badge-item.unlocked {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+        }
+        .badge-icon {
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+        .badge-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a class="active" href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">{{ user["branch_code"] }} • USN: {{ user["usn"] }}</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="welcome-box">
+                <div class="welcome-left">
+                    <div class="vtu-tag">
+                        <i class="fa-solid fa-award"></i> AICTE / VTU MANDATORY REQUIREMENT
+                    </div>
+                    <h1>VTU 100 Activity Points Tracker</h1>
+                    <p>Track your mandatory 100 activity points required by Visvesvaraya Technological University for award of the B.E. Degree with Honours and standard certification.</p>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="stats-banner">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(99, 102, 241, 0.12); color: var(--primary);">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h4>Required</h4>
+                        <div class="num">{{ required_points }} Pts</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h4>Earned</h4>
+                        <div class="num" style="color: #10b981;">{{ total_earned }} Pts</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b;">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h4>Remaining</h4>
+                        <div class="num">{{ remaining_points }} Pts</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: rgba(236, 72, 153, 0.12); color: #ec4899;">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h4>Completion</h4>
+                        <div class="num">{{ percentage }}%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LAYOUT -->
+            <div class="points-layout">
+                <!-- FORM -->
+                <div class="form-card">
+                    <h3 style="font-size: 18px; margin-bottom: 8px;">
+                        <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Add Activity Record
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Log workshops, hackathons, sports, NSS or innovation points.</p>
+
+                    <form method="POST" action="{{ url_for('activity_points') }}">
+                        <div class="form-group">
+                            <label>Activity Name *</label>
+                            <input type="text" name="activity_name" class="form-control" placeholder="e.g. Smart India Hackathon / IEEE Paper" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category *</label>
+                            <select name="category" class="form-control">
+                                <option value="Technical events">Technical events</option>
+                                <option value="Hackathons">Hackathons</option>
+                                <option value="Workshops">Workshops & Bootcamps</option>
+                                <option value="Seminars">Seminars & Conferences</option>
+                                <option value="Sports">Sports & Athletics</option>
+                                <option value="Cultural activities">Cultural activities</option>
+                                <option value="Social activities">Social activities</option>
+                                <option value="NSS">National Service Scheme (NSS)</option>
+                                <option value="Innovation activities">Innovation & IPR</option>
+                                <option value="Entrepreneurship activities">Entrepreneurship / Startups</option>
+                                <option value="Certifications">Professional Certifications</option>
+                                <option value="Other approved activities">Other VTU Approved Activities</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Date *</label>
+                            <input type="date" name="activity_date" class="form-control" value="2026-03-15" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Host / Organization</label>
+                            <input type="text" name="organization" class="form-control" placeholder="e.g. VTU Belagavi / College Dept">
+                        </div>
+                        <div class="form-group">
+                            <label>Points Claimed (AICTE Matrix) *</label>
+                            <input type="number" name="points" class="form-control" min="5" max="50" value="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Certificate Drive / Cloud Link</label>
+                            <input type="url" name="certificate_url" class="form-control" placeholder="https://drive.google.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Short Description</label>
+                            <textarea name="description" class="form-control" rows="3" placeholder="Brief details about role, deliverables, or awards won..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 8px;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Submit Activity
+                        </button>
+                    </form>
+
+                    <div style="margin-top: 28px;">
+                        <h4 style="font-size: 14px; margin-bottom: 8px;">Degree Milestones</h4>
+                        <div class="points-progress-bar">
+                            <div class="points-fill" style="width: {{ percentage }}%;"></div>
+                        </div>
+                        <div class="badges-grid">
+                            <div class="badge-item {% if total_earned >= 25 %}unlocked{% endif %}">
+                                <div class="badge-icon">🥉</div>
+                                <div class="badge-title">Level 1 (25 Pts)</div>
+                            </div>
+                            <div class="badge-item {% if total_earned >= 50 %}unlocked{% endif %}">
+                                <div class="badge-icon">🥈</div>
+                                <div class="badge-title">Level 2 (50 Pts)</div>
+                            </div>
+                            <div class="badge-item {% if total_earned >= 75 %}unlocked{% endif %}">
+                                <div class="badge-icon">🥇</div>
+                                <div class="badge-title">Level 3 (75 Pts)</div>
+                            </div>
+                            <div class="badge-item {% if total_earned >= 100 %}unlocked{% endif %}">
+                                <div class="badge-icon">🏆</div>
+                                <div class="badge-title">VTU Certified (100 Pts)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLE OF ACTIVITIES -->
+                <div class="table-card">
+                    <h3 style="font-size: 18px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Logged Activity Records
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">All submitted certificates for VTU academic audits.</p>
+
+                    <div style="overflow-x: auto;">
+                        <table class="vtu-table">
+                            <thead>
+                                <tr>
+                                    <th>Activity & Category</th>
+                                    <th>Organization</th>
+                                    <th>Date</th>
+                                    <th>Points</th>
+                                    <th>Certificate</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if activities %}
+                                    {% for act in activities %}
+                                    <tr>
+                                        <td>
+                                            <div style="font-weight: 700; color: var(--text);">{{ act['activity_name'] }}</div>
+                                            <div style="font-size: 12px; color: var(--muted);">{{ act['category'] }}</div>
+                                        </td>
+                                        <td>{{ act['organization'] or '—' }}</td>
+                                        <td style="font-size: 13px;">{{ act['activity_date'] }}</td>
+                                        <td>
+                                            <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; background: rgba(16, 185, 129, 0.12); color: #10b981; font-weight: 800; font-size: 12px;">
+                                                +{{ act['points'] }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if act['certificate_url'] %}
+                                                <a href="{{ act['certificate_url'] }}" target="_blank" style="color: var(--primary); font-size: 13px; font-weight: 600; text-decoration: underline;">
+                                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> View
+                                                </a>
+                                            {% else %}
+                                                <span style="color: var(--muted); font-size: 12px;">Self-Declared</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span style="font-size: 12px; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 6px;">
+                                                <i class="fa-solid fa-check"></i> {{ act['status'] }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="6" style="text-align: center; padding: 36px; color: var(--muted);">
+                                            No activities recorded yet. Add your first certificate using the form on the left.
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTU Academic Dashboard | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .sem-nav-container {
+            margin: 28px 0 24px;
+            overflow-x: auto;
+            padding-bottom: 6px;
+        }
+        .sem-tabs {
+            display: flex;
+            gap: 10px;
+            min-width: max-content;
+        }
+        .sem-tab {
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .sem-tab:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .sem-tab.active {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 6px 18px var(--primary-glow);
+        }
+        .marks-table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 28px;
+            overflow-x: auto;
+        }
+        .vtu-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        .vtu-table th {
+            text-align: left;
+            padding: 14px 16px;
+            color: var(--muted);
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-alt);
+        }
+        .vtu-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+            vertical-align: middle;
+        }
+        .vtu-table tr:hover td {
+            background: rgba(79, 70, 229, 0.03);
+        }
+        .marks-input {
+            width: 65px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            background: var(--surface);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .marks-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .grade-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 12px;
+            text-align: center;
+        }
+        .grade-O { background: #dcfce7; color: #15803d; }
+        .grade-Ap { background: #e0e7ff; color: #4338ca; }
+        .grade-A { background: #ede9fe; color: #6d28d9; }
+        .grade-Bp { background: #fef3c7; color: #b45309; }
+        .grade-B { background: #ffedd5; color: #c2410c; }
+        .grade-C { background: #f1f5f9; color: #475569; }
+        .grade-P { background: #e2e8f0; color: #334155; }
+        .grade-F { background: #fee2e2; color: #b91c1c; }
+        .btn-save-row {
+            padding: 8px 14px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-save-row:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .btn-learn {
+            padding: 8px 14px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-learn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .badge-type {
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: var(--surface-alt);
+            color: var(--muted);
+            font-weight: 700;
+        }
+        .vtu-header-card {
+            background:
+                radial-gradient(circle at 90% 15%, rgba(99, 102, 241, 0.4), transparent 45%),
+                linear-gradient(135deg, #1e1b4b, #0f172a);
+            color: white;
+            padding: 32px 36px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin: 28px 0 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .vtu-header-card h1 {
+            font-size: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin-bottom: 6px;
+        }
+        .vtu-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .vtu-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .chart-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-top: 24px;
+        }
+        .gpa-bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 20px;
+            height: 180px;
+            padding: 20px 10px 10px;
+            border-bottom: 2px solid var(--border);
+            margin-top: 15px;
+        }
+        .gpa-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+            gap: 6px;
+        }
+        .gpa-bar {
+            width: 100%;
+            max-width: 42px;
+            background: linear-gradient(180deg, var(--primary), #818cf8);
+            border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease;
+            position: relative;
+        }
+        .gpa-bar:hover {
+            filter: brightness(1.15);
+        }
+        .gpa-val {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .gpa-label {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="logo-icon">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            Edu<span>Spark</span>
+        </div>
+
+        <nav class="side-nav">
+            <a class="active" href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="main">
+
+        <!-- ================= TOPBAR ================= -->
+        <header class="topbar">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <!-- Interactive Pomodoro Study Focus Timer -->
+                <div class="study-pomodoro" id="studyPomodoro">
+                    <i class="fa-solid fa-stopwatch" style="color: var(--primary);"></i>
+                    <span id="pomoDisplay" style="font-weight: 800; font-family: monospace; font-size: 13.5px; letter-spacing: 0.5px;">25:00</span>
+                    <button type="button" id="pomoToggleBtn" onclick="togglePomodoro()" title="Start/Pause 25-Min Study Session" style="background:none; border:none; color:var(--primary); cursor:pointer; font-size:12px; padding:2px 4px;">
+                        <i class="fa-solid fa-play" id="pomoIcon"></i>
+                    </button>
+                    <button type="button" onclick="resetPomodoro()" title="Reset Timer" style="background:none; border:none; color:var(--muted); cursor:pointer; font-size:11px; padding:2px 4px;">
+                        <i class="fa-solid fa-rotate-left"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="top-actions">
+                <button type="button" onclick="toggleFocusMode()" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-bullseye" style="color: var(--primary);"></i> Focus Mode
+                </button>
+
+                <button type="button" onclick="openCheatSheetDrawer()" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; border-color: #6366f1; color: #6366f1;">
+                    <i class="fa-solid fa-bolt"></i> Exam Cheat Sheet
+                </button>
+
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <strong>{{ user["name"] }}</strong>
+                        <small>{{ user["usn"] if user["usn"] else branch["short_name"] }}</small>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <!-- Focus Mode Active Banner -->
+        <div class="focus-banner" id="focusModeBanner">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-bullseye" style="font-size: 18px;"></i>
+                <span><strong>Focus Study Mode Active:</strong> Distractions minimized. Master your VTU syllabus modules with complete concentration.</span>
+            </div>
+            <button onclick="toggleFocusMode()" class="btn btn-outline" style="background: rgba(255,255,255,0.2); color: white; border-color: rgba(255,255,255,0.4); padding: 4px 12px; font-size: 12px; border-radius: 999px;">
+                <i class="fa-solid fa-xmark"></i> Exit Focus Mode
+            </button>
+        </div>
+
+        <!-- ================= VTU PROFILE CARD ================= -->
+        <section class="vtu-header-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <span style="font-size: 13px; font-weight: 800; color: #a5b4fc; letter-spacing: 1.5px; text-transform: uppercase;">
+                        VISVESVARAYA TECHNOLOGICAL UNIVERSITY
+                    </span>
+                    <h1>{{ user["name"] }}</h1>
+                    <p style="color: #cbd5e1; font-size: 15px;">
+                        <i class="fa-solid fa-building-columns" style="margin-right: 6px;"></i>
+                        {{ user["college"] }}
+                    </p>
+                </div>
+
+                <a href="{{ url_for('ai_tutor_page') }}" class="primary-button" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); box-shadow: none;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    Ask EduSpark AI
+                </a>
+            </div>
+
+            <div class="vtu-badges">
+                <div class="vtu-pill">
+                    <i class="fa-solid fa-id-card" style="color: #67e8f9;"></i>
+                    USN: <b>{{ user["usn"] if user["usn"] else "NOT ENTERED" }}</b>
+                </div>
+                <div class="vtu-pill">
+                    <i class="fa-solid fa-code-branch" style="color: #a7f3d0;"></i>
+                    Branch: <b>{{ branch["name"] }} ({{ branch["short_name"] }})</b>
+                </div>
+                <div class="vtu-pill">
+                    <i class="fa-solid fa-layer-group" style="color: #fde68a;"></i>
+                    Scheme: <b>{{ scheme["name"] }}</b>
+                </div>
+                <div class="vtu-pill">
+                    <i class="fa-solid fa-calendar" style="color: #fbcfe8;"></i>
+                    Year: <b>Year {{ user["current_year"] }} (Sem {{ user["current_sem"] }})</b>
+                </div>
+                <div class="vtu-pill">
+                    <i class="fa-solid fa-certificate" style="color: #c7d2fe;"></i>
+                    Activity Points: <b>{{ activity_points_earned }} / 100</b>
+                </div>
+                <div class="vtu-pill" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #34d399;">
+                    <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+                    <b>REAL-TIME ENGINE ACTIVE</b>
+                </div>
+            </div>
+
+            <!-- Exam Countdown & Study Target Banner -->
+            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div class="countdown-pill">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>VTU Semester Exams Approaching • Target Goal: <b>8.5+ SGPA</b></span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button type="button" onclick="openCheatSheetDrawer()" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.25); color: white; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-bolt" style="color: #fde68a;"></i> Semester Cheat Sheet
+                    </button>
+                    <a href="{{ url_for('visual_learning') }}" style="background: rgba(99, 102, 241, 0.3); border: 1px solid rgba(165, 180, 252, 0.35); color: #e0e7ff; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-shapes"></i> Visual Diagrams
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ACADEMIC OVERVIEW KPI CARDS ================= -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon purple">
+                    <i class="fa-solid fa-star"></i>
+                </div>
+                <div style="width: 100%;">
+                    <span>Current CGPA</span>
+                    <strong id="kpi-cgpa">
+                        {% if gpa_data["has_official_results"] %}
+                            {{ gpa_data["cgpa"] }}
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </strong>
+                    <small id="kpi-class">{% if gpa_data["has_official_results"] %}{{ gpa_data.get("vtu_class", "VTU Scale 10.0") }}{% else %}Awaiting Official VTU Results{% endif %}</small>
+                    <div class="stat-meter-container">
+                        <div class="stat-meter-bar">
+                            <div class="stat-meter-fill purple" id="meter-cgpa" style="width: {{ (gpa_data['cgpa'] / 10.0 * 100)|round|int if gpa_data['has_official_results'] and gpa_data['cgpa'] else 0 }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-percent"></i>
+                </div>
+                <div style="width: 100%;">
+                    <span>Overall Percentage</span>
+                    <strong id="kpi-percentage">
+                        {% if gpa_data["has_official_results"] %}
+                            {{ gpa_data["percentage"] }}%
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </strong>
+                    <small>{% if gpa_data["has_official_results"] %}Official (CGPA - 0.75)×10{% else %}Calculated from VTU Results{% endif %}</small>
+                    <div class="stat-meter-container">
+                        <div class="stat-meter-bar">
+                            <div class="stat-meter-fill blue" id="meter-percentage" style="width: {{ gpa_data['percentage']|int if gpa_data['has_official_results'] and gpa_data['percentage'] else 0 }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-check-double"></i>
+                </div>
+                <div style="width: 100%;">
+                    <span>Completed Credits</span>
+                    <strong id="kpi-credits">{{ gpa_data["total_credits_earned"] }} / {{ gpa_data["total_credits_scheme"] }}</strong>
+                    <small>{{ gpa_data["completed_subjects"] }} Verified Courses Passed</small>
+                    <div class="stat-meter-container">
+                        <div class="stat-meter-bar">
+                            <div class="stat-meter-fill green" id="meter-credits" style="width: {{ (gpa_data['total_credits_earned'] / (gpa_data['total_credits_scheme'] or 160) * 100)|round|int }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+                <div style="width: 100%;">
+                    <span>Sem {{ selected_sem }} SGPA</span>
+                    <strong id="kpi-sem-sgpa">
+                        {% if gpa_data["sgpa_by_sem"].get(selected_sem) %}
+                            {{ gpa_data["sgpa_by_sem"][selected_sem] }}
+                        {% else %}
+                            Pending
+                        {% endif %}
+                    </strong>
+                    <small>{% if gpa_data["sgpa_by_sem"].get(selected_sem) %}Official VTU CBCS{% else %}Import / Enter Marks Below{% endif %}</small>
+                    {% set cur_sem_sgpa = gpa_data["sgpa_by_sem"].get(selected_sem, 0) %}
+                    <div class="stat-meter-container">
+                        <div class="stat-meter-bar">
+                            <div class="stat-meter-fill orange" id="meter-sem-sgpa" style="width: {{ (cur_sem_sgpa / 10.0 * 100)|round|int if cur_sem_sgpa else 0 }}%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SEMESTER NAVIGATION (1 TO 8) ================= -->
+        <div class="sem-nav-container">
+            <div class="sem-tabs">
+                {% for sem_idx in range(1, 9) %}
+                <a href="{{ url_for('dashboard', sem=sem_idx) }}" class="sem-tab {% if sem_idx == selected_sem %}active{% endif %}">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    Semester {{ sem_idx }}
+                    {% if gpa_data["sgpa_by_sem"].get(sem_idx) %}
+                    <span style="font-size: 11px; opacity: 0.9; margin-left: 2px;">({{ gpa_data["sgpa_by_sem"][sem_idx] }})</span>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ================= MARKS STRUCTURE & ACADEMIC COURSES TABLE ================= -->
+        <div class="marks-table-card">
+            <!-- VTU Results & VTU Verse Direct Sync Toolbar -->
+            <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 800; font-size: 13px; color: var(--primary);">
+                        <i class="fa-solid fa-server"></i> VTU Results &amp; VTU Verse Sync:
+                    </span>
+                    <span style="font-size: 12px; color: var(--muted);">Direct access &amp; official CBCS formula validation</span>
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button onclick="document.getElementById('vtuMarksCardModal').style.display = 'flex'" class="btn btn-success" style="font-size: 12px; padding: 6px 14px;">
+                        <i class="fa-solid fa-file-invoice"></i> Official VTU Marks Sheet
+                    </button>
+                    <button onclick="document.getElementById('importVtuModal').style.display = 'flex'" class="btn btn-primary" style="font-size: 12px; padding: 6px 14px;">
+                        <i class="fa-solid fa-file-import"></i> Paste &amp; Import VTU Results
+                    </button>
+                    <a href="https://results.vtu.ac.in" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> results.vtu.ac.in
+                    </a>
+                    <a href="https://vtuverse.com/vtu-results/" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">
+                        <i class="fa-solid fa-globe"></i> VTU Verse Results
+                    </a>
+                    <a href="https://vtuverse.com/vtu-sgpa-calculator/" target="_blank" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">
+                        <i class="fa-solid fa-calculator"></i> VTU Verse Calculator
+                    </a>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <span style="font-size: 12px; font-weight: 800; color: var(--primary); letter-spacing: 1px;">
+                        SEMESTER {{ selected_sem }} CURRICULUM &amp; MARKS STRUCTURE
+                    </span>
+                    <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; margin-top: 2px;">
+                        {{ branch["short_name"] }} — {{ scheme["code"] }} Scheme ({{ courses|length }} Subjects)
+                    </h2>
+                </div>
+                
+                <!-- Live Instant Subject Search Filter -->
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div style="position: relative; min-width: 250px;">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px;"></i>
+                        <input type="text" id="subjectFilterInput" oninput="filterDashboardSubjects(this.value)" placeholder="Search subjects or course code..." style="padding: 8px 12px 8px 34px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; width: 100%; outline: none; transition: all 0.2s;">
+                    </div>
+                    <span id="subjectFilterCount" style="font-size: 12px; font-weight: 700; color: var(--muted); background: var(--surface-alt); padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border);">
+                        Showing {{ courses|length }} of {{ courses|length }}
+                    </span>
+                </div>
+            </div>
+
+            {% if courses %}
+            <table class="vtu-table">
+                <thead>
+                    <tr>
+                        <th>Course Code</th>
+                        <th>Subject Name</th>
+                        <th>Type</th>
+                        <th>Credits</th>
+                        <th style="text-align: center;">Internal (CIE) /50</th>
+                        <th style="text-align: center;">External (SEE) /50</th>
+                        <th style="text-align: center;">Total /100</th>
+                        <th style="text-align: center;">Grade</th>
+                        <th style="text-align: center;">Grade Point</th>
+                        <th style="text-align: center;">Credit Points</th>
+                        <th style="text-align: center;">Result</th>
+                        <th style="text-align: center;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in courses %}
+                    <tr id="row-course-{{ c['id'] }}">
+                        <td>
+                            <strong style="color: var(--primary); font-family: monospace; font-size: 14px;">
+                                {{ c["course_code"] }}
+                            </strong>
+                        </td>
+                        <td>
+                            <div style="font-weight: 700;">{{ c["course_name"] }}</div>
+                            <small style="color: var(--muted); font-size: 12px;">{{ c["description"][:65] }}...</small>
+                        </td>
+                        <td><span class="badge-type">{{ c["course_type"] }}</span></td>
+                        <td><b>{{ c["credits"] }}</b></td>
+
+                        <!-- Verified CIE / SEE Marks (Real-Time CBCS Engine) -->
+                        <td style="text-align: center;">
+                            <input type="number" min="0" max="50" step="1"
+                                   id="cie-{{ c['id'] }}"
+                                   class="marks-input"
+                                   placeholder="—"
+                                   value="{{ c['cie_marks']|int if c['cie_marks'] is not none else '' }}"
+                                   oninput="realtimeMarksInput({{ c['id'] }}, {{ selected_sem }}, {{ c['credits'] }})"
+                                   onchange="autoSaveMarks({{ c['id'] }}, {{ selected_sem }})">
+                        </td>
+                        <td style="text-align: center;">
+                            <input type="number" min="0" max="50" step="1"
+                                   id="see-{{ c['id'] }}"
+                                   class="marks-input"
+                                   placeholder="—"
+                                   value="{{ c['see_marks']|int if c['see_marks'] is not none else '' }}"
+                                   oninput="realtimeMarksInput({{ c['id'] }}, {{ selected_sem }}, {{ c['credits'] }})"
+                                   onchange="autoSaveMarks({{ c['id'] }}, {{ selected_sem }})">
+                        </td>
+                        <td style="text-align: center; font-weight: 800;" id="total-{{ c['id'] }}">
+                            {{ c['total_marks']|int if c['total_marks'] is not none else '—' }}
+                        </td>
+                        <td style="text-align: center;">
+                            {% if c['grade'] %}
+                            <span class="grade-badge grade-{{ c['grade']|replace('+', 'p') }}" id="grade-{{ c['id'] }}">
+                                {{ c['grade'] }}
+                            </span>
+                            {% else %}
+                            <span style="color: var(--muted); font-weight: 700;" id="grade-{{ c['id'] }}">—</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center; font-weight: 800;" id="gp-{{ c['id'] }}">
+                            {{ c['grade_point'] if c['grade_point'] is not none else '—' }}
+                        </td>
+                        <td style="text-align: center; font-weight: 800; color: var(--primary);" id="cp-{{ c['id'] }}">
+                            {{ c['credit_points'] if c['credit_points'] is not none else '—' }}
+                        </td>
+                        <td style="text-align: center;">
+                            {% if c['result'] %}
+                            <span style="font-weight: 700; color: {{ '#16a34a' if c['result'] == 'Pass' else '#dc2626' }};" id="res-{{ c['id'] }}">
+                                {{ c['result'] }}
+                            </span>
+                            {% else %}
+                            <span style="color: var(--muted); font-size: 12px; font-weight: 600;" id="res-{{ c['id'] }}">
+                                <i class="fa-solid fa-clock"></i> Awaiting Results
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center;">
+                            <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                                <a href="{{ url_for('course_detail', course_id=c['id']) }}" class="btn-learn" title="Open Learning Portal">
+                                    <i class="fa-solid fa-book-open"></i> Learn
+                                </a>
+                                <a href="{{ c['vtu_circle_url'] or 'https://vtucircle.com' }}" target="_blank" class="btn-save-row" title="VTU Circle Syllabus & Notes" style="text-decoration: none;">
+                                    <i class="fa-solid fa-circle-nodes"></i> Circle
+                                </a>
+                                <button onclick="autoSaveMarks({{ c['id'] }}, {{ selected_sem }})" class="btn-save-row" title="Save Marks">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="background: var(--surface-alt); font-weight: 800; border-top: 2px solid var(--border);">
+                        <td colspan="3" style="text-align: right; padding: 14px 16px;">Semester {{ selected_sem }} Totals &amp; Credits:</td>
+                        <td style="padding: 14px 16px;"><b>{{ sem_summary.registered_credits if sem_summary else '—' }}</b></td>
+                        <td style="text-align: center; color: var(--muted); font-size: 13px;" id="foot-cie-total">CIE: {{ sem_summary.total_cie if sem_summary else '—' }}</td>
+                        <td style="text-align: center; color: var(--muted); font-size: 13px;" id="foot-see-total">SEE: {{ sem_summary.total_see if sem_summary else '—' }}</td>
+                        <td style="text-align: center; font-weight: 800;" id="foot-total-marks">{{ sem_summary.total_marks if sem_summary else '—' }}</td>
+                        <td style="text-align: center;">—</td>
+                        <td style="text-align: center;">—</td>
+                        <td style="text-align: center; font-weight: 800; color: var(--primary);" id="foot-credit-points">{{ sem_summary.credit_points if sem_summary else '—' }}</td>
+                        <td style="text-align: center;">
+                            <span style="display: inline-block; padding: 4px 10px; border-radius: 999px; background: rgba(99, 102, 241, 0.12); color: var(--primary); font-size: 12px; font-weight: 800;" id="foot-sem-sgpa-badge">
+                                SGPA: {{ sem_summary.sgpa if sem_summary and sem_summary.sgpa is not none else 'Pending' }}
+                            </span>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+                </tbody>
+            </table>
+            {% else %}
+            <div style="text-align: center; padding: 40px; color: var(--muted);">
+                <i class="fa-solid fa-graduation-cap" style="font-size: 40px; margin-bottom: 12px; color: var(--primary);"></i>
+                <p>No subjects mapped for {{ branch["name"] }} under Semester {{ selected_sem }}.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ================= SGPA & CGPA PROGRESSION CHART ================= -->
+        <div class="chart-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div>
+                    <span style="font-size: 12px; font-weight: 800; color: var(--primary); letter-spacing: 1px;">
+                        PERFORMANCE ANALYTICS
+                    </span>
+                    <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 18px; margin-top: 2px;">
+                        Semester-wise SGPA Progression (Target: ≥ 8.5)
+                    </h3>
+                </div>
+                <div style="font-size: 13px; color: var(--muted);">
+                    Overall CGPA: <strong style="color: var(--primary);">{{ gpa_data["cgpa"] }}</strong> ({{ gpa_data["percentage"] }}%)
+                </div>
+            </div>
+
+            <div class="gpa-bar-chart">
+                {% for sem_num in range(1, 9) %}
+                {% set sem_sgpa = gpa_data["sgpa_by_sem"].get(sem_num, 0) %}
+                <div class="gpa-bar-wrapper">
+                    <span class="gpa-val" id="chart-val-sem-{{ sem_num }}">{{ sem_sgpa if sem_sgpa > 0 else '-' }}</span>
+                    <div class="gpa-bar" id="chart-bar-sem-{{ sem_num }}" style="height: {{ (sem_sgpa / 10.0 * 100)|int if sem_sgpa > 0 else 8 }}%;"></div>
+                    <span class="gpa-label">Sem {{ sem_num }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ================= DASHBOARD GRID: CAREER MODULES ================= -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT: Core Subjects Learning Cards -->
+            <div>
+                <div class="section-title">
+                    <div>
+                        <span>LEARNING MODULES</span>
+                        <h2>Interactive Subject Portal</h2>
+                    </div>
+                    <a href="{{ url_for('syllabus') }}">View Full Scheme Syllabus <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+
+                <div class="learning-cards">
+                    {% for c in courses[:4] %}
+                    <div class="learning-card">
+                        <div class="subject-icon physics">
+                            <i class="fa-solid {{ c['icon'] }}"></i>
+                        </div>
+                        <div class="course-info">
+                            <span class="course-category">{{ c["course_code"] }} • {{ c["course_type"] }}</span>
+                            <h3>{{ c["course_name"] }}</h3>
+                            <p>{{ c["description"] }}</p>
+                            <div class="progress-bar">
+                                <div style="width: 75%;"></div>
+                            </div>
+                            <span class="progress-text">Units: {{ c["completed_units"] }} / {{ c["units_count"] if c["units_count"] > 0 else 5 }} Mastered</span>
+                        </div>
+                        <a href="{{ url_for('course_detail', course_id=c['id']) }}" class="continue-btn">
+                            Open Module <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Activity Points & Career Trackers -->
+            <div class="right-column">
+
+                <!-- Academic SGPA Goal & Target Simulator Widget -->
+                <div class="streak-widget" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(6, 182, 212, 0.05)); border: 1.5px solid var(--border);">
+                    <div class="widget-heading">
+                        <h3 style="display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-crosshairs" style="color: var(--primary);"></i>
+                            SGPA Goal Simulator
+                        </h3>
+                        <span class="badge-type" style="background: rgba(99, 102, 241, 0.15); color: var(--primary); font-weight: 800;">VTU 2022/25</span>
+                    </div>
+                    <p style="text-align: left; font-size: 13px; color: var(--muted); margin: 8px 0 14px;">
+                        Calculate the required External (SEE) score across your subjects to achieve your target SGPA in Semester {{ selected_sem }}:
+                    </p>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; background: var(--surface); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border);">
+                        <label for="targetSgpaSelect" style="font-size: 13px; font-weight: 700;">Target Goal:</label>
+                        <select id="targetSgpaSelect" onchange="recalculateTargetSimulation()" style="padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--primary); background: var(--surface); color: var(--primary); font-weight: 800; font-size: 13.5px; cursor: pointer; outline: none;">
+                            <option value="7.5">7.5 SGPA (First Class)</option>
+                            <option value="8.0">8.0 SGPA (Distinction)</option>
+                            <option value="8.5" selected>8.5 SGPA (High Distinction)</option>
+                            <option value="9.0">9.0 SGPA (Top 5% VTU)</option>
+                            <option value="9.5">9.5+ SGPA (University Rank)</option>
+                        </select>
+                    </div>
+
+                    <div id="simResultBox" style="background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center;">
+                        <div style="font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 800; letter-spacing: 0.5px;">Avg Required SEE Marks</div>
+                        <div id="simReqSee" style="font-size: 26px; font-weight: 900; color: var(--primary); margin: 4px 0;">38 <span style="font-size: 14px; color: var(--muted); font-weight: 600;">/ 50</span></div>
+                        <div id="simReqStatus" style="font-size: 12px; font-weight: 700; color: #10b981;">
+                            <i class="fa-solid fa-circle-check"></i> Readily Achievable with regular revision!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 100 Activity Points Widget -->
+                <div class="streak-widget">
+                    <div class="widget-heading">
+                        <h3>VTU 100 Activity Points</h3>
+                        <i class="fa-solid fa-award" style="color: #f59e0b; font-size: 20px;"></i>
+                    </div>
+
+                    <div style="margin: 20px 0 10px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 6px;">
+                            <span>Progress</span>
+                            <span style="color: var(--primary);">{{ activity_points_earned }} / 100 Pts</span>
+                        </div>
+                        <div class="progress-bar" style="max-width: 100%; height: 8px;">
+                            <div style="width: {{ activity_points_earned }}%;"></div>
+                        </div>
+                    </div>
+
+                    <p style="text-align: left; font-size: 13px; line-height: 1.6; margin-bottom: 14px;">
+                        {% if activity_points_earned >= 100 %}
+                        <span style="color: #10b981; font-weight: 700;">🎉 Mandatory requirement completed!</span>
+                        {% else %}
+                        Remaining: <strong>{{ 100 - activity_points_earned }} points</strong> required for degree eligibility.
+                        {% endif %}
+                    </p>
+
+                    <a href="{{ url_for('activity_points') }}" class="continue-btn" style="display: block; text-align: center;">
+                        Manage Activity Points <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Internship Tracker Widget -->
+                <div class="streak-widget">
+                    <div class="widget-heading">
+                        <h3>Industry Internship</h3>
+                        <i class="fa-solid fa-briefcase" style="color: var(--secondary); font-size: 18px;"></i>
+                    </div>
+
+                    {% if internship %}
+                    <div style="margin: 16px 0;">
+                        <strong style="display: block; font-size: 15px; color: var(--text);">{{ internship["company"] }}</strong>
+                        <span style="color: var(--muted); font-size: 13px;">{{ internship["domain"] }}</span>
+                        <div style="margin-top: 10px; display: flex; gap: 8px;">
+                            <span class="badge-type" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                                {{ internship["status"] }}
+                            </span>
+                            <span class="badge-type">{{ internship["duration"] }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p style="text-align: left; margin: 12px 0;">No internship registered yet for 8th sem.</p>
+                    {% endif %}
+
+                    <a href="{{ url_for('internships') }}" class="continue-btn" style="display: block; text-align: center;">
+                        View Internship Tracker <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- AI Study Buddy Prompt Widget -->
+                <div class="ai-widget">
+                    <div class="ai-widget-icon">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <span>EDUSPARK AI COPILOT</span>
+                    <h3>VTU Exam Study Assistant</h3>
+                    <p>Ask for simplified analogies, step-by-step algorithms, or previous VTU 10-mark exam questions.</p>
+                    <a href="{{ url_for('ai_tutor_page') }}">
+                        <button><i class="fa-solid fa-sparkles"></i> Launch AI Tutor</button>
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= QUICK ACTIONS ================= -->
+        <section class="quick-actions">
+            <h2>Academic Quick Links</h2>
+            <div class="action-grid">
+                <a href="{{ url_for('syllabus') }}">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <strong>Official VTU Syllabus</strong>
+                    <span>Direct syllabus PDFs &amp; course codes</span>
+                </a>
+
+                <a href="{{ url_for('visual_learning') }}">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <strong>Visual Learning Hub</strong>
+                    <span>Architectures, dataflow &amp; algorithms</span>
+                </a>
+
+                <a href="{{ url_for('mock_tests') }}">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <strong>Subject Mock Tests</strong>
+                    <span>Timed quizzes with instant analysis</span>
+                </a>
+
+                <a href="{{ url_for('nptel') }}">
+                    <i class="fa-solid fa-award"></i>
+                    <strong>NPTEL Course Portal</strong>
+                    <span>Swayam credit transfer assignments</span>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Real-Time CBCS Evaluation & Auto-Save JavaScript -->
+    <script>
+        const debounceTimers = {};
+
+        function calculateVtuGrade(cie, see) {
+            if (cie === null && see === null) {
+                return { total: '—', grade: '—', gp: '—', result: 'Awaiting Results' };
+            }
+            const c = (cie === null || isNaN(cie)) ? 0 : cie;
+            const s = (see === null || isNaN(see)) ? 0 : see;
+            const total = Math.round(c + s);
+            
+            // VTU Standard CBCS Regulations: SEE >= 18/50 and Total >= 40/100
+            let grade = 'F';
+            let gp = 0;
+            let result = 'Fail';
+            
+            if (s < 18 || total < 40) {
+                grade = 'F';
+                gp = 0;
+                result = 'Fail';
+            } else if (total >= 90) {
+                grade = 'O'; gp = 10; result = 'Pass';
+            } else if (total >= 80) {
+                grade = 'A+'; gp = 9; result = 'Pass';
+            } else if (total >= 70) {
+                grade = 'A'; gp = 8; result = 'Pass';
+            } else if (total >= 60) {
+                grade = 'B+'; gp = 7; result = 'Pass';
+            } else if (total >= 55) {
+                grade = 'B'; gp = 6; result = 'Pass';
+            } else if (total >= 50) {
+                grade = 'C'; gp = 5; result = 'Pass';
+            } else {
+                grade = 'P'; gp = 4; result = 'Pass';
+            }
+            
+            return { total, grade, gp, result };
+        }
+
+        function realtimeMarksInput(courseId, semester, credits) {
+            const cieInput = document.getElementById(`cie-${courseId}`);
+            const seeInput = document.getElementById(`see-${courseId}`);
+            
+            const cieVal = cieInput && cieInput.value !== '' ? parseFloat(cieInput.value) : null;
+            const seeVal = seeInput && seeInput.value !== '' ? parseFloat(seeInput.value) : null;
+            
+            const evalResult = calculateVtuGrade(cieVal, seeVal);
+            
+            // Instant Row UI Update
+            const totalElem = document.getElementById(`total-${courseId}`);
+            if (totalElem) totalElem.textContent = evalResult.total;
+            
+            const gradeElem = document.getElementById(`grade-${courseId}`);
+            if (gradeElem) {
+                gradeElem.textContent = evalResult.grade;
+                gradeElem.className = `grade-badge grade-${evalResult.grade.replace('+', 'p')}`;
+            }
+            
+            const gpElem = document.getElementById(`gp-${courseId}`);
+            if (gpElem) gpElem.textContent = evalResult.gp;
+            
+            const cpElem = document.getElementById(`cp-${courseId}`);
+            const creditPoints = (typeof evalResult.gp === 'number') ? (credits * evalResult.gp).toFixed(1) : '—';
+            if (cpElem) cpElem.textContent = creditPoints;
+            
+            const resElem = document.getElementById(`res-${courseId}`);
+            if (resElem) {
+                resElem.textContent = evalResult.result;
+                resElem.style.color = (evalResult.result === 'Pass') ? '#16a34a' : (evalResult.result === 'Fail' ? '#dc2626' : 'var(--muted)');
+            }
+            
+            // Instant Semester Recalculation (SGPA, Footers, and Analytics Bar Chart)
+            recalculateSemesterRealtime(semester);
+            
+            // Debounced Database Persistence (450ms)
+            if (debounceTimers[courseId]) clearTimeout(debounceTimers[courseId]);
+            debounceTimers[courseId] = setTimeout(() => {
+                autoSaveMarks(courseId, semester, true);
+            }, 450);
+        }
+
+        function recalculateSemesterRealtime(semester) {
+            const rows = document.querySelectorAll('[id^="row-course-"]');
+            let sumCie = 0, sumSee = 0, sumTotal = 0;
+            let sumCreditPoints = 0, sumMarkedCredits = 0, sumEarnedCredits = 0;
+            let anyMarked = false;
+            let passCount = 0;
+            
+            rows.forEach(row => {
+                const courseId = row.id.replace('row-course-', '');
+                const cieInput = document.getElementById(`cie-${courseId}`);
+                const seeInput = document.getElementById(`see-${courseId}`);
+                const cieVal = (cieInput && cieInput.value !== '') ? parseFloat(cieInput.value) : null;
+                const seeVal = (seeInput && seeInput.value !== '') ? parseFloat(seeInput.value) : null;
+                
+                const cells = row.getElementsByTagName('td');
+                const cr = cells.length > 3 ? parseFloat(cells[3].innerText.trim()) : 0;
+                
+                if (cieVal !== null || seeVal !== null) {
+                    anyMarked = true;
+                    const c = cieVal || 0;
+                    const s = seeVal || 0;
+                    const tot = c + s;
+                    sumCie += c;
+                    sumSee += s;
+                    sumTotal += tot;
+                    
+                    const ev = calculateVtuGrade(cieVal, seeVal);
+                    if (typeof ev.gp === 'number') {
+                        sumMarkedCredits += cr;
+                        sumCreditPoints += (cr * ev.gp);
+                        if (ev.result === 'Pass') {
+                            sumEarnedCredits += cr;
+                            passCount++;
+                        }
+                    }
+                }
+            });
+            
+            if (anyMarked && sumMarkedCredits > 0) {
+                const sgpa = (sumCreditPoints / sumMarkedCredits);
+                const sgpaFormatted = sgpa.toFixed(2);
+                
+                // Live Table Footers
+                const footCie = document.getElementById('foot-cie-total');
+                if (footCie) footCie.textContent = `CIE: ${Math.round(sumCie)}`;
+                const footSee = document.getElementById('foot-see-total');
+                if (footSee) footSee.textContent = `SEE: ${Math.round(sumSee)}`;
+                const footTotal = document.getElementById('foot-total-marks');
+                if (footTotal) footTotal.textContent = Math.round(sumTotal);
+                const footCp = document.getElementById('foot-credit-points');
+                if (footCp) footCp.textContent = sumCreditPoints.toFixed(1);
+                const footSgpa = document.getElementById('foot-sem-sgpa-badge');
+                if (footSgpa) footSgpa.textContent = `SGPA: ${sgpaFormatted}`;
+                
+                // Live KPI Card
+                const kpiSemSgpa = document.getElementById('kpi-sem-sgpa');
+                if (kpiSemSgpa) kpiSemSgpa.textContent = sgpaFormatted;
+                
+                // Live Bar Chart Update
+                const chartVal = document.getElementById(`chart-val-sem-${semester}`);
+                if (chartVal) chartVal.textContent = sgpaFormatted;
+                const chartBar = document.getElementById(`chart-bar-sem-${semester}`);
+                if (chartBar) {
+                    const h = Math.min(100, Math.max(8, Math.round((sgpa / 10.0) * 100)));
+                    chartBar.style.height = `${h}%`;
+                }
+
+                // Live Sem SGPA Micro-Meter
+                const meterSem = document.getElementById('meter-sem-sgpa');
+                if (meterSem) {
+                    meterSem.style.width = `${Math.min(100, Math.max(0, Math.round((sgpa / 10.0) * 100)))}%`;
+                }
+            }
+        }
+
+        async function autoSaveMarks(courseId, semester, isBackground = false) {
+            const cie = document.getElementById(`cie-${courseId}`).value;
+            const see = document.getElementById(`see-${courseId}`).value;
+
+            try {
+                const response = await fetch('/api/marks/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course_id: courseId,
+                        semester: semester,
+                        cie_marks: cie,
+                        see_marks: see
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    // Update table row cells
+                    document.getElementById(`total-${courseId}`).textContent = data.total_marks;
+                    
+                    const gradeElem = document.getElementById(`grade-${courseId}`);
+                    gradeElem.textContent = data.grade;
+                    gradeElem.className = `grade-badge grade-${data.grade.replace('+', 'p')}`;
+
+                    document.getElementById(`gp-${courseId}`).textContent = data.grade_point;
+                    
+                    const cpElem = document.getElementById(`cp-${courseId}`);
+                    if (cpElem && data.credit_points !== undefined) {
+                        cpElem.textContent = data.credit_points;
+                    }
+
+                    const resElem = document.getElementById(`res-${courseId}`);
+                    resElem.textContent = data.result;
+                    resElem.style.color = (data.result === 'Pass') ? '#16a34a' : '#dc2626';
+
+                    // Update Cumulative KPI cards
+                    document.getElementById('kpi-cgpa').textContent = data.gpa_data.cgpa;
+                    document.getElementById('kpi-percentage').textContent = `${data.gpa_data.percentage}%`;
+                    document.getElementById('kpi-credits').textContent = `${data.gpa_data.total_credits_earned} / ${data.gpa_data.total_credits_scheme}`;
+
+                    // Update KPI Micro-Meters
+                    const meterCgpa = document.getElementById('meter-cgpa');
+                    if (meterCgpa && data.gpa_data.cgpa) {
+                        meterCgpa.style.width = `${Math.min(100, Math.round((data.gpa_data.cgpa / 10.0) * 100))}%`;
+                    }
+                    const meterPercentage = document.getElementById('meter-percentage');
+                    if (meterPercentage && data.gpa_data.percentage) {
+                        meterPercentage.style.width = `${Math.min(100, Math.round(data.gpa_data.percentage))}%`;
+                    }
+                    const meterCredits = document.getElementById('meter-credits');
+                    if (meterCredits && data.gpa_data.total_credits_scheme) {
+                        meterCredits.style.width = `${Math.min(100, Math.round((data.gpa_data.total_credits_earned / data.gpa_data.total_credits_scheme) * 100))}%`;
+                    }
+
+                    const classElem = document.getElementById('kpi-class');
+                    if (classElem && data.gpa_data.vtu_class) {
+                        classElem.textContent = data.gpa_data.vtu_class;
+                    }
+
+                    if (data.gpa_data.sgpa_by_sem[semester]) {
+                        document.getElementById('kpi-sem-sgpa').textContent = data.gpa_data.sgpa_by_sem[semester];
+                        const meterSem = document.getElementById('meter-sem-sgpa');
+                        if (meterSem) {
+                            meterSem.style.width = `${Math.min(100, Math.round((data.gpa_data.sgpa_by_sem[semester] / 10.0) * 100))}%`;
+                        }
+                    }
+
+                    if (!isBackground) {
+                        showToast("✓ Marks saved & VTU SGPA updated!");
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to update marks:", err);
+            }
+        }
+
+        // VTU Verse Import handler
+        async function submitVtuVerseImport() {
+            const rawText = document.getElementById("vtuResultText").value.trim();
+            if (!rawText) {
+                alert("Please paste your result text or subject marks.");
+                return;
+            }
+            try {
+                const res = await fetch("/api/results/import-vtuverse", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ raw_text: rawText })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message);
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    alert("Unable to parse marks. Please check format.");
+                }
+            } catch (err) {
+                alert("Network error while syncing VTU Verse results.");
+            }
+        }
+
+        function populateSampleVtuVerse() {
+            document.getElementById("vtuResultText").value = 
+`BAD601 44 42
+BAD602 46 45
+BAD613A 45 44
+BADL604 48 48
+BADP606 48 47
+BAEC607 40 40
+BCS615A 45 42
+BIKS608 42 45
+BMUS659 40 42`;
+        }
+
+        // Theme Toggle
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+        // Focus Study Mode Toggle
+        function toggleFocusMode() {
+            document.body.classList.toggle("focus-mode");
+            const isFocus = document.body.classList.contains("focus-mode");
+            showToast(isFocus ? "🎯 Focus Mode Active: Distractions Hidden" : "Focus Mode Disabled");
+        }
+
+        // Slide-over Cheat Sheet Drawer Toggle
+        function openCheatSheetDrawer() {
+            const drawer = document.getElementById("cheatSheetDrawer");
+            if (drawer) drawer.classList.add("active");
+        }
+
+        function closeCheatSheetDrawer() {
+            const drawer = document.getElementById("cheatSheetDrawer");
+            if (drawer) drawer.classList.remove("active");
+        }
+
+        // Live Subject Table Instant Filter
+        function filterDashboardSubjects(query) {
+            const q = (query || "").toLowerCase().trim();
+            const rows = document.querySelectorAll("tbody tr[id^='row-course-']");
+            let visible = 0;
+            rows.forEach(r => {
+                const text = r.textContent.toLowerCase();
+                if (!q || text.includes(q)) {
+                    r.style.display = "";
+                    visible++;
+                } else {
+                    r.style.display = "none";
+                }
+            });
+            const countBadge = document.getElementById("subjectFilterCount");
+            if (countBadge) {
+                countBadge.textContent = `Showing ${visible} of ${rows.length}`;
+            }
+        }
+
+        // Target SGPA Simulator Engine
+        function recalculateTargetSimulation() {
+            const select = document.getElementById("targetSgpaSelect");
+            const target = parseFloat(select ? select.value : "8.5");
+            let reqSee = 38;
+            let statusText = "High Distinction • Readily Achievable with regular revision";
+            let statusColor = "#10b981";
+            let icon = "fa-circle-check";
+
+            if (target >= 9.5) {
+                reqSee = 47;
+                statusText = "University Rank Pace • Requires 90%+ in each theory & lab";
+                statusColor = "#8b5cf6";
+                icon = "fa-crown";
+            } else if (target >= 9.0) {
+                reqSee = 43;
+                statusText = "Top 5% VTU • Master 10-mark repeated questions";
+                statusColor = "#3b82f6";
+                icon = "fa-medal";
+            } else if (target >= 8.5) {
+                reqSee = 38;
+                statusText = "High Distinction • Readily Achievable with regular revision";
+                statusColor = "#10b981";
+                icon = "fa-circle-check";
+            } else if (target >= 8.0) {
+                reqSee = 34;
+                statusText = "Distinction • Focus on 3 key units per subject";
+                statusColor = "#10b981";
+                icon = "fa-thumbs-up";
+            } else {
+                reqSee = 28;
+                statusText = "First Class Standard • Clear passing threshold with ease";
+                statusColor = "#059669";
+                icon = "fa-check";
+            }
+
+            const seeElem = document.getElementById("simReqSee");
+            if (seeElem) {
+                seeElem.innerHTML = `${reqSee} <span style="font-size: 14px; color: var(--muted); font-weight: 600;">/ 50</span>`;
+            }
+            const statElem = document.getElementById("simReqStatus");
+            if (statElem) {
+                statElem.style.color = statusColor;
+                statElem.innerHTML = `<i class="fa-solid ${icon}"></i> ${statusText}`;
+            }
+        }
+
+        // Pomodoro Study Timer (25 Minutes)
+        let pomoSeconds = 25 * 60;
+        let pomoInterval = null;
+        let pomoRunning = false;
+
+        function formatPomoTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, "0");
+            const s = (sec % 60).toString().padStart(2, "0");
+            return `${m}:${s}`;
+        }
+
+        function togglePomodoro() {
+            const icon = document.getElementById("pomoIcon");
+            if (pomoRunning) {
+                clearInterval(pomoInterval);
+                pomoRunning = false;
+                if (icon) icon.className = "fa-solid fa-play";
+                showToast("Study timer paused.");
+            } else {
+                pomoRunning = true;
+                if (icon) icon.className = "fa-solid fa-pause";
+                showToast("Focus timer started! 25 minutes of deep study.");
+                pomoInterval = setInterval(() => {
+                    if (pomoSeconds > 0) {
+                        pomoSeconds--;
+                        document.getElementById("pomoDisplay").textContent = formatPomoTime(pomoSeconds);
+                    } else {
+                        clearInterval(pomoInterval);
+                        pomoRunning = false;
+                        if (icon) icon.className = "fa-solid fa-play";
+                        showToast("🎉 Focus block completed! Take a 5-minute breather.");
+                        try {
+                            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                            const osc = ctx.createOscillator();
+                            osc.type = "sine";
+                            osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+                            osc.connect(ctx.destination);
+                            osc.start();
+                            osc.stop(ctx.currentTime + 0.6);
+                        } catch(e) {}
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetPomodoro() {
+            clearInterval(pomoInterval);
+            pomoRunning = false;
+            pomoSeconds = 25 * 60;
+            document.getElementById("pomoDisplay").textContent = "25:00";
+            const icon = document.getElementById("pomoIcon");
+            if (icon) icon.className = "fa-solid fa-play";
+            showToast("Focus timer reset to 25:00.");
+        }
+    </script>
+
+    <!-- VTU VERSE / VTU RESULTS IMPORT MODAL -->
+    <div id="importVtuModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); max-width: 620px; width: 100%; padding: 28px; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--text);">
+                    <i class="fa-solid fa-file-import" style="color: var(--primary);"></i> Import VTU Results / VTU Verse Text
+                </h3>
+                <button onclick="document.getElementById('importVtuModal').style.display = 'none'" style="background: none; border: none; font-size: 18px; color: var(--muted); cursor: pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <p style="font-size: 13px; color: var(--muted); margin-bottom: 14px; line-height: 1.5;">
+                Paste the text copied from <b>results.vtu.ac.in</b> or <b>vtuverse.com</b>. The engine automatically parses course codes, internal marks (CIE), and external marks (SEE), and calculates SGPA and CGPA according to VTU regulations.
+            </p>
+            <textarea id="vtuResultText" rows="6" placeholder="Example format:&#10;BAD601 44 42&#10;BAD602 46 45&#10;BAD603 48 47" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-alt); color: var(--text); font-family: monospace; font-size: 13px; outline: none; margin-bottom: 14px;"></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <button type="button" onclick="populateSampleVtuVerse()" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Load Sample VTU Data
+                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" onclick="document.getElementById('importVtuModal').style.display = 'none'" class="btn btn-outline">Cancel</button>
+                    <button type="button" onclick="submitVtuVerseImport()" class="btn btn-primary">
+                        <i class="fa-solid fa-check"></i> Parse &amp; Calculate SGPA
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OFFICIAL VTU PROVISIONAL RESULTS SHEET MODAL -->
+    <div id="vtuMarksCardModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+        <div style="background: #ffffff; color: #0f172a; border: 2px solid #4f46e5; border-radius: 16px; max-width: 950px; width: 100%; padding: 36px; box-shadow: 0 25px 60px rgba(0,0,0,0.35); max-height: 92vh; overflow-y: auto; position: relative;" id="vtuMarksPrintArea">
+            
+            <!-- Close Button (hidden during print) -->
+            <button type="button" onclick="document.getElementById('vtuMarksCardModal').style.display = 'none'" class="no-print" style="position: absolute; top: 20px; right: 24px; background: none; border: none; font-size: 22px; color: #64748b; cursor: pointer;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- VTU Crest & Official University Header -->
+            <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 16px; margin-bottom: 20px;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 14px; margin-bottom: 6px;">
+                    <div style="width: 52px; height: 52px; border-radius: 50%; background: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div>
+                        <h2 style="font-size: 22px; font-weight: 900; letter-spacing: 1px; color: #0f172a; margin: 0; text-transform: uppercase;">
+                            VISVESVARAYA TECHNOLOGICAL UNIVERSITY, BELAGAVI
+                        </h2>
+                        <p style="font-size: 13px; color: #475569; margin: 3px 0 0; font-weight: 600;">(State Technological University of Government of Karnataka Established as per the VTU Act, 1994)</p>
+                    </div>
+                </div>
+                <div style="display: inline-block; background: #eef2ff; color: #4338ca; border: 1.5px solid #c7d2fe; padding: 5px 20px; border-radius: 999px; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; margin-top: 10px;">
+                    PROVISIONAL STATEMENT OF MARKS / GRADES (CBCS {{ scheme['code'] }} SCHEME)
+                </div>
+            </div>
+
+            <!-- Student & Examination Particulars -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 22px; font-size: 13.5px; color: #1e293b;">
+                <div><b>University Seat No (USN):</b> <span style="font-family: monospace; font-weight: 900; color: #4f46e5; font-size: 15px; margin-left: 4px;">{{ user["usn"] if user["usn"] else '4MN23AD006' }}</span></div>
+                <div><b>Student Full Name:</b> <span style="font-weight: 800; text-transform: uppercase; margin-left: 4px;">{{ user["name"] }}</span></div>
+                <div><b>Degree &amp; Program:</b> B.E. in {{ branch["name"] }} ({{ branch["short_name"] }})</div>
+                <div><b>Curriculum Scheme:</b> VTU {{ scheme["code"] }} Scheme (CBCS Standard)</div>
+                <div><b>Semester:</b> {{ selected_sem }}{% if selected_sem == 1 %}st{% elif selected_sem == 2 %}nd{% elif selected_sem == 3 %}rd{% else %}th{% endif %} Semester</div>
+                <div><b>College / Institution:</b> {{ user["college"] }}</div>
+            </div>
+
+            <!-- Official Statement of Marks Table -->
+            <table style="width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 20px; border: 1.5px solid #94a3b8; color: #0f172a;">
+                <thead>
+                    <tr style="background: #1e1b4b; color: white;">
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">Sl.</th>
+                        <th style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: left;">Subject Code</th>
+                        <th style="padding: 10px 10px; border: 1px solid #cbd5e1; text-align: left;">Subject Title</th>
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">CIE /50</th>
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">SEE /50</th>
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">Total /100</th>
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">Credits (Ci)</th>
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">Grade</th>
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">Grade Point (Gi)</th>
+                        <th style="padding: 10px 6px; border: 1px solid #cbd5e1; text-align: center;">Credit Points (Ci×Gi)</th>
+                        <th style="padding: 10px 8px; border: 1px solid #cbd5e1; text-align: center;">Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in courses %}
+                    <tr style="background: {{ '#f8fafc' if loop.index % 2 == 0 else '#ffffff' }};">
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: 700;">{{ loop.index }}</td>
+                        <td style="padding: 8px 8px; border: 1px solid #cbd5e1; font-family: monospace; font-weight: 800; color: #4f46e5;">{{ c['course_code'] }}</td>
+                        <td style="padding: 8px 10px; border: 1px solid #cbd5e1; font-weight: 600;">{{ c['course_name'] }}</td>
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center;">{{ c['cie_marks']|int if c['cie_marks'] is not none else '—' }}</td>
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center;">{{ c['see_marks']|int if c['see_marks'] is not none else '—' }}</td>
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: 800;">{{ c['total_marks']|int if c['total_marks'] is not none else '—' }}</td>
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: 700;">{{ c['credits'] }}</td>
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: 800;">{{ c['grade'] or '—' }}</td>
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: 800;">{{ c['grade_point'] if c['grade_point'] is not none else '—' }}</td>
+                        <td style="padding: 8px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: 800; color: #4338ca;">{{ c['credit_points'] if c['credit_points'] is not none else '—' }}</td>
+                        <td style="padding: 8px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: 800; color: {{ '#16a34a' if c['result'] == 'Pass' else ('#dc2626' if c['result'] == 'Fail' else '#64748b') }};">
+                            {{ c['result'] or 'Awaiting' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="background: #f1f5f9; font-weight: 800;">
+                        <td colspan="3" style="padding: 10px; border: 1px solid #94a3b8; text-align: right;">Semester {{ selected_sem }} Totals:</td>
+                        <td style="padding: 10px; border: 1px solid #94a3b8; text-align: center;">{{ sem_summary.total_cie if sem_summary else '—' }}</td>
+                        <td style="padding: 10px; border: 1px solid #94a3b8; text-align: center;">{{ sem_summary.total_see if sem_summary else '—' }}</td>
+                        <td style="padding: 10px; border: 1px solid #94a3b8; text-align: center;">{{ sem_summary.total_marks if sem_summary else '—' }}</td>
+                        <td style="padding: 10px; border: 1px solid #94a3b8; text-align: center;">{{ sem_summary.registered_credits if sem_summary else '—' }}</td>
+                        <td colspan="2" style="padding: 10px; border: 1px solid #94a3b8; text-align: center;">Earned: {{ sem_summary.earned_credits if sem_summary else '—' }}</td>
+                        <td style="padding: 10px; border: 1px solid #94a3b8; text-align: center; color: #4338ca;">{{ sem_summary.credit_points if sem_summary else '—' }}</td>
+                        <td style="padding: 10px; border: 1px solid #94a3b8; text-align: center;">{{ sem_summary.subjects_passed if sem_summary else 0 }} Pass</td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <!-- Summary & Official Result Classification -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; text-align: center;">
+                <div style="background: #eef2ff; border: 1.5px solid #c7d2fe; border-radius: 12px; padding: 14px;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 700; letter-spacing: 0.5px;">Semester {{ selected_sem }} SGPA</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #4338ca; margin-top: 4px;">{{ sem_summary.sgpa if sem_summary and sem_summary.sgpa is not none else 'Pending' }}</div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Σ(Ci × Gi) / ΣCi</div>
+                </div>
+                <div style="background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 12px; padding: 14px;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 700; letter-spacing: 0.5px;">Cumulative CGPA</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #15803d; margin-top: 4px;">{{ gpa_data['cgpa'] }}</div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Overall Completed Semesters</div>
+                </div>
+                <div style="background: #f0f9ff; border: 1.5px solid #bae6fd; border-radius: 12px; padding: 14px;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 700; letter-spacing: 0.5px;">VTU Percentage</div>
+                    <div style="font-size: 24px; font-weight: 900; color: #0369a1; margin-top: 4px;">{{ gpa_data['percentage'] }}%</div>
+                    <div style="font-size: 11px; color: #64748b; margin-top: 2px;">(CGPA - 0.75) × 10</div>
+                </div>
+                <div style="background: #fdf4ff; border: 1.5px solid #f5d0fe; border-radius: 12px; padding: 14px;">
+                    <div style="font-size: 11px; text-transform: uppercase; color: #475569; font-weight: 700; letter-spacing: 0.5px;">Result / Class Awarded</div>
+                    <div style="font-size: 14px; font-weight: 900; color: #a21caf; margin-top: 8px; line-height: 1.3;">{{ gpa_data['vtu_class'] }}</div>
+                </div>
+            </div>
+
+            <!-- Official Footnote and Print Actions -->
+            <div style="border-top: 1px dashed #94a3b8; padding-top: 16px; font-size: 11.5px; color: #64748b; line-height: 1.6; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 14px;">
+                <div>
+                    <div><b>VTU CBCS Grading Scale:</b> O (90-100, GP 10) | A+ (80-89, GP 9) | A (70-79, GP 8) | B+ (60-69, GP 7) | B (55-59, GP 6) | C (50-54, GP 5) | P (40-49, GP 4) | F (&lt;40 or SEE &lt;18, GP 0)</div>
+                    <div><b>Passing Standards:</b> SEE Minimum 18/50 (35%) AND Total Minimum 40/100 (40%) as mandated under Visvesvaraya Technological University Belagavi Regulations.</div>
+                    <div style="margin-top: 4px; font-style: italic; color: #94a3b8;">* Note: This is an official computer-generated provisional transcript rendered according to VTU Results Portal standards.</div>
+                </div>
+                <div style="display: flex; gap: 10px;" class="no-print">
+                    <button type="button" onclick="window.print()" class="btn btn-primary" style="font-size: 13px; padding: 10px 18px;">
+                        <i class="fa-solid fa-print"></i> Print Transcript / Save PDF
+                    </button>
+                    <button type="button" onclick="document.getElementById('vtuMarksCardModal').style.display = 'none'" class="btn btn-outline" style="font-size: 13px; padding: 10px 18px;">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLIDE-OVER HIGH-YIELD EXAM CHEAT SHEET DRAWER -->
+    <div class="drawer-backdrop" id="cheatSheetDrawer" onclick="if(event.target === this) closeCheatSheetDrawer()">
+        <div class="drawer-panel">
+            <div class="drawer-header">
+                <div>
+                    <h3 style="font-size: 17px; font-weight: 800; display: flex; align-items: center; gap: 8px; color: var(--text);">
+                        <i class="fa-solid fa-bolt" style="color: #6366f1;"></i>
+                        Semester {{ selected_sem }} Exam Cheat Sheet
+                    </h3>
+                    <small style="color: var(--muted); font-size: 12px;">VTU CBCS High-Yield Formulas &amp; Exam Strategy</small>
+                </div>
+                <button onclick="closeCheatSheetDrawer()" style="background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer; padding: 4px;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="drawer-body">
+                <!-- VTU Mandatory Passing Criteria -->
+                <div style="background: rgba(99, 102, 241, 0.08); border: 1.5px solid rgba(99, 102, 241, 0.2); border-radius: 12px; padding: 16px;">
+                    <h4 style="color: var(--primary); font-size: 14px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-scale-balanced"></i> VTU CBCS Passing Standards
+                    </h4>
+                    <ul style="font-size: 13px; line-height: 1.7; color: var(--text); padding-left: 20px; margin: 0;">
+                        <li><b>SEE Passing Minimum:</b> Must score at least <b>18 out of 50</b> (35%) in semester-end theory/lab exam.</li>
+                        <li><b>Aggregate Passing Minimum:</b> Combined total (CIE + SEE) must be at least <b>40 out of 100</b> (40%).</li>
+                        <li><b>VTU Percentage Formula:</b> <code>Percentage = (CGPA - 0.75) × 10</code>.</li>
+                    </ul>
+                </div>
+
+                <!-- 3-Hour Exam Blueprint -->
+                <div style="background: #fefce8; border: 1px solid #fde047; border-radius: 12px; padding: 16px; color: #854d0e;">
+                    <h4 style="font-size: 14px; font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-clock"></i> VTU 3-Hour Exam Allocation (100 Marks Scheme)
+                    </h4>
+                    <div style="font-size: 12.5px; line-height: 1.6;">
+                        • <b>5 Main Questions:</b> Answer 1 full question from each of the 5 modules (20 Marks each).<br>
+                        • <b>Time Management:</b> Allot 32 minutes per question (160 minutes total).<br>
+                        • <b>Labeling &amp; Checking:</b> Keep 20 minutes at the end to review labels, diagrams, and question numbers.
+                    </div>
+                </div>
+
+                <!-- Active Subjects Quick Access -->
+                <div>
+                    <h4 style="font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                        <i class="fa-solid fa-book-bookmark" style="color: #10b981;"></i> Current Semester Subjects Quick Links
+                    </h4>
+                    {% for c in courses %}
+                    <div style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <strong style="color: var(--primary); font-size: 13px;">{{ c['course_code'] }} — {{ c['course_name'] }}</strong>
+                            <span class="badge-type">{{ c['credits'] }} Credits</span>
+                        </div>
+                        <p style="font-size: 12px; color: var(--muted); margin: 6px 0 8px;">{{ c['description'][:85] }}...</p>
+                        <a href="{{ url_for('course_detail', course_id=c['id']) }}" style="font-size: 12px; font-weight: 700; color: var(--primary); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            Study 5 Modules &amp; Visual Diagrams <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Stylesheet -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden !important;
+            }
+            #vtuMarksPrintArea, #vtuMarksPrintArea * {
+                visibility: visible !important;
+            }
+            #vtuMarksCardModal {
+                position: static !important;
+                display: block !important;
+                background: none !important;
+                padding: 0 !important;
+            }
+            #vtuMarksPrintArea {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 10px !important;
+                margin: 0 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

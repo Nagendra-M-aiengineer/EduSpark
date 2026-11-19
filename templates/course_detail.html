@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ course["course_name"] }} ({{ course["course_code"] }}) | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .course-hero {
+            background:
+                radial-gradient(circle at 90% 20%, rgba(99, 102, 241, 0.4), transparent 45%),
+                linear-gradient(135deg, #1e1b4b, #0f172a);
+            color: white;
+            padding: 36px 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin: 28px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .course-code-tag {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.35);
+            border: 1px solid rgba(165, 180, 252, 0.4);
+            color: #c7d2fe;
+            padding: 4px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .course-hero h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+        .course-meta-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .course-pill {
+            padding: 6px 14px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .syllabus-source-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-syllabus {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            box-shadow: 0 4px 12px var(--primary-glow);
+            transition: all 0.2s;
+        }
+        .btn-syllabus:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--primary-glow);
+        }
+        .btn-syllabus-disabled {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--surface-alt);
+            color: var(--muted);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px dashed var(--border);
+        }
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 24px;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .tab-content-panel {
+            display: none;
+        }
+        .tab-content-panel.active {
+            display: block;
+        }
+        .unit-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 26px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 22px;
+            transition: all 0.2s;
+        }
+        .unit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .unit-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+        .concept-svg {
+            width: 100%;
+            height: auto;
+            max-height: 220px;
+            background: var(--surface-alt);
+            border-radius: 12px;
+            padding: 12px;
+            margin: 16px 0;
+            border: 1px solid var(--border);
+        }
+        .box-analogy {
+            background: rgba(245, 158, 11, 0.08);
+            border-left: 4px solid #f59e0b;
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 14px 0;
+            font-size: 14px;
+            color: var(--text);
+        }
+        .box-notes {
+            background: rgba(16, 185, 129, 0.08);
+            border-left: 4px solid #10b981;
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 14px 0;
+            font-size: 14px;
+            white-space: pre-line;
+            line-height: 1.7;
+        }
+        .box-questions {
+            background: rgba(99, 102, 241, 0.08);
+            border-left: 4px solid var(--primary);
+            padding: 14px 18px;
+            border-radius: 0 10px 10px 0;
+            margin: 14px 0;
+            font-size: 14px;
+            white-space: pre-line;
+            line-height: 1.7;
+        }
+        .quiz-option {
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .quiz-option.correct {
+            border-color: #16a34a !important;
+            background: #dcfce7 !important;
+            color: #15803d !important;
+            font-weight: 700;
+        }
+        .quiz-option.wrong {
+            border-color: #dc2626 !important;
+            background: #fee2e2 !important;
+            color: #b91c1c !important;
+        }
+        .ai-chat-bubble {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-top: 16px;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            Edu<span>Spark</span>
+        </div>
+
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a class="active" href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>Course Details</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-list-check"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div>
+                <a href="{{ url_for('dashboard', sem=course['semester']) }}" class="back-link">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back to Semester {{ course["semester"] }} Dashboard
+                </a>
+            </div>
+
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <strong>{{ user["name"] }}</strong>
+                        <small>{{ user["usn"] }}</small>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <!-- Course Header -->
+        <section class="course-hero">
+            <span class="course-code-tag">{{ course["course_code"] }}</span>
+            <h1>{{ course["course_name"] }}</h1>
+            <p style="color: #cbd5e1; max-width: 700px; font-size: 15px;">{{ course["description"] }}</p>
+
+            <div class="course-meta-pills">
+                <div class="course-pill"><i class="fa-solid fa-layer-group" style="color:#67e8f9;"></i> {{ scheme["name"] }}</div>
+                <div class="course-pill"><i class="fa-solid fa-code-branch" style="color:#a7f3d0;"></i> {{ branch["name"] }}</div>
+                <div class="course-pill"><i class="fa-solid fa-calendar" style="color:#fde68a;"></i> Semester {{ course["semester"] }}</div>
+                <div class="course-pill"><i class="fa-solid fa-award" style="color:#fbcfe8;"></i> {{ course["credits"] }} Credits</div>
+                <div class="course-pill"><i class="fa-solid fa-tag" style="color:#c7d2fe;"></i> {{ course["course_type"] }}</div>
+            </div>
+        </section>
+
+        <!-- Official VTU Syllabus Link Banner -->
+        <div class="syllabus-source-banner">
+            <div>
+                <div style="font-weight: 800; font-size: 15px; color: var(--text);">
+                    <i class="fa-solid fa-certificate" style="color: var(--primary); margin-right: 6px;"></i>
+                    Official VTU Scheme, VTU Circle &amp; VTU Verse Resources
+                </div>
+                <small style="color: var(--muted); font-size: 13px;">
+                    Source: <b>{{ course["source_status"] }}</b> • Verified Session: <b>{{ course["last_updated"] }}</b>
+                </small>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                {% if course["syllabus_url"] %}
+                <a href="{{ course['syllabus_url'] }}" target="_blank" class="btn-syllabus">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    Official VTU PDF
+                </a>
+                {% else %}
+                <div class="btn-syllabus-disabled">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    Official syllabus link unavailable
+                </div>
+                {% endif %}
+
+                <a href="{{ course['vtu_circle_url'] or 'https://vtucircle.com' }}" target="_blank" class="btn-syllabus" style="background: linear-gradient(135deg, #0ea5e9, #0284c7);">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    VTU Circle Notes
+                </a>
+
+                <a href="https://vtuverse.com/sgpa-calculator" target="_blank" class="btn-syllabus" style="background: linear-gradient(135deg, #10b981, #059669);">
+                    <i class="fa-solid fa-calculator"></i>
+                    VTU Verse Calc
+                </a>
+            </div>
+        </div>
+
+        <!-- AI Multimodal Visualizer & Engine Selector Banner -->
+        <div style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(16, 185, 129, 0.08)); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px 22px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: var(--shadow-sm);">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="background: linear-gradient(135deg, #4f46e5, #06b6d4); color: white; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI MULTIMODAL VISUALIZER
+                    </span>
+                    <strong style="font-size: 15px; color: var(--text);">Concept Visualizer &amp; Multi-Model Explainer</strong>
+                </div>
+                <p style="font-size: 13px; color: var(--muted); margin: 4px 0 0;">
+                    Select an AI engine to dynamically visualize concepts, generate interactive SVG diagrams, and formulate 10-mark VTU exam blueprints:
+                </p>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="globalAiModelSelector">
+                <button type="button" class="ai-model-btn active" id="btn-model-gemini" onclick="selectAiModel('gemini', this)" style="padding: 8px 14px; border-radius: 10px; border: 1.5px solid #4285f4; background: #eef2ff; color: #1d4ed8; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-brands fa-google" style="color: #4285f4;"></i> Gemini 1.5 Pro
+                </button>
+                <button type="button" class="ai-model-btn" id="btn-model-gpt" onclick="selectAiModel('gpt', this)" style="padding: 8px 14px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-brain" style="color: #10a37f;"></i> GPT-4o
+                </button>
+                <button type="button" class="ai-model-btn" id="btn-model-claude" onclick="selectAiModel('claude', this)" style="padding: 8px 14px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-microchip" style="color: #d97706;"></i> Claude 3.5 Sonnet
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('learn')">
+                <i class="fa-solid fa-brain"></i> 🧠 Learn &amp; Concepts
+            </button>
+            <button class="tab-btn" onclick="switchTab('visual')">
+                <i class="fa-solid fa-shapes"></i> 🎨 Visual Diagrams
+            </button>
+            <button class="tab-btn" onclick="switchTab('notes')">
+                <i class="fa-solid fa-file-lines"></i> 📝 VTU Notes
+            </button>
+            <button class="tab-btn" onclick="switchTab('questions')">
+                <i class="fa-solid fa-circle-question"></i> ❓ Exam Questions
+            </button>
+            <button class="tab-btn" onclick="switchTab('quiz')">
+                <i class="fa-solid fa-flask-vial"></i> 🧪 Unit Quiz
+            </button>
+            <button class="tab-btn" onclick="switchTab('ai')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> 💡 Ask EduSpark AI
+            </button>
+        </div>
+
+        <!-- TAB 1: LEARN -->
+        <div id="tab-learn" class="tab-content-panel active">
+            {% if units %}
+            {% for u in units %}
+            <div class="unit-card">
+                <div class="unit-header">
+                    <div>
+                        <span class="unit-badge">UNIT {{ u["unit_number"] }}</span>
+                        <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; margin-top: 4px;" id="unit-title-{{ u['unit_number'] }}">
+                            {{ u["unit_title"] }}
+                        </h2>
+                    </div>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; cursor: pointer; color: var(--primary);">
+                        <input type="checkbox" id="check-unit-{{ u['id'] }}"
+                                {% if u["is_completed"] %}checked{% endif %}
+                                onchange="toggleUnitMastery({{ course['id'] }}, {{ u['id'] }})"
+                                style="width: 18px; height: 18px; accent-color: var(--primary);">
+                        <span>Mark Unit Mastered</span>
+                    </label>
+                </div>
+
+                <div style="font-size: 13px; color: var(--muted); margin-bottom: 12px;">
+                    <strong>VTU Syllabus Topics:</strong> {{ u["syllabus_content"] }}
+                </div>
+
+                <h4 style="color: var(--primary); margin: 16px 0 6px;">💡 Simplified Explanation</h4>
+                <p style="font-size: 15px; line-height: 1.7; color: var(--text);">{{ u["simplified_explanation"] }}</p>
+
+                <div class="box-analogy">
+                    <strong>Real-Life Analogy:</strong> {{ u["real_life_analogy"] }}
+                </div>
+
+                {% if u["visual_diagram_svg"] %}
+                <div style="margin: 20px 0 16px; background: var(--surface-alt); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px; box-shadow: var(--shadow-sm);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <span style="font-size: 13px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 6px;">
+                            <i class="fa-solid fa-shapes"></i> Pictorial Representation &amp; Architectural Model
+                        </span>
+                        <span style="font-size: 11px; font-weight: 700; background: rgba(99, 102, 241, 0.12); color: var(--primary); padding: 3px 10px; border-radius: 999px;">
+                            Interactive Vector Schematic
+                        </span>
+                    </div>
+                    {{ u["visual_diagram_svg"]|safe }}
+                    <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 12.5px; color: var(--muted);">
+                        <span><i class="fa-solid fa-circle-info" style="color: var(--primary);"></i> Labeled components illustrate exact VTU evaluation criteria.</span>
+                        <span style="font-weight: 700; color: var(--text);">Module {{ u['unit_number'] }} Visual Blueprint</span>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- AI Multimodal Action Bar for this Unit -->
+                <div style="margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <button type="button" onclick="triggerAiUnitVisualization({{ course['id'] }}, {{ u['unit_number'] }})" class="btn btn-outline" style="font-size: 13px; padding: 8px 14px; color: var(--primary); border-color: var(--primary); cursor: pointer;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> ✨ Visualize Unit {{ u['unit_number'] }} with AI (<span class="current-model-label">Gemini</span>)
+                    </button>
+                    <span style="font-size: 12px; color: var(--muted); font-weight: 600;">
+                        <i class="fa-solid fa-clock"></i> {{ u['hours'] }} Hours • VTU Module {{ u['unit_number'] }}
+                    </span>
+                </div>
+                <!-- Dynamic AI Visualization Output Container for this Unit -->
+                <div id="ai-vis-container-{{ u['unit_number'] }}" style="display: none; margin-top: 16px; padding: 18px; border-radius: 12px; background: var(--surface-alt); border: 1px solid var(--border);"></div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="unit-card" style="text-align: center; padding: 40px;">
+                <p style="color: var(--muted); font-size: 15px;">
+                    Unit curriculum details are currently being finalized according to the latest VTU circular.
+                </p>
+                {% if course["syllabus_url"] %}
+                <a href="{{ course['syllabus_url'] }}" target="_blank" class="btn-syllabus" style="margin-top: 14px;">
+                    <i class="fa-solid fa-file-pdf"></i> Read Official Syllabus PDF
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB 2: VISUAL LEARNING -->
+        <div id="tab-visual" class="tab-content-panel">
+            <!-- Dynamic AI Concept Visualizer & Diagram Generator -->
+            <div style="background: var(--surface); border: 1.5px solid var(--border); border-radius: 14px; padding: 22px; margin-bottom: 24px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 14px;">
+                    <div>
+                        <h3 style="font-size: 18px; font-weight: 800; color: var(--text);">
+                            <i class="fa-solid fa-shapes" style="color: var(--primary);"></i> AI Dynamic Concept Visualizer &amp; SVG Generator
+                        </h3>
+                        <p style="font-size: 13px; color: var(--muted); margin-top: 2px;">
+                            Generate custom visual engineering diagrams &amp; mental models for any concept in <b>{{ course['course_name'] }}</b>.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="badge-type" style="background: rgba(66, 133, 244, 0.15); color: #2563eb;">Google Gemini</span>
+                        <span class="badge-type" style="background: rgba(16, 163, 127, 0.15); color: #059669;">GPT-4o</span>
+                        <span class="badge-type" style="background: rgba(217, 119, 6, 0.15); color: #d97706;">Claude 3.5</span>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="customVisConceptInput" class="marks-input" style="width: 100%; height: 46px; text-align: left; padding: 0 16px; font-size: 14px;" placeholder="Enter topic to visualize (e.g. 'Orthographic projections of line inclined to both HP and VP', 'Isometric scale', '4 quadrants')...">
+                    <button type="button" onclick="generateCustomAiDiagram({{ course['id'] }})" class="btn-syllabus" style="cursor: pointer; white-space: nowrap;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Diagram
+                    </button>
+                </div>
+                <div id="customVisOutput" style="display: none; margin-top: 16px; padding: 18px; border-radius: 12px; background: var(--surface-alt); border: 1px solid var(--border);"></div>
+            </div>
+
+            {% set has_diagram = false %}
+            {% for u in units %}
+            {% if u["visual_diagram_svg"] %}
+            {% set has_diagram = true %}
+            <div class="unit-card">
+                <span class="unit-badge">UNIT {{ u["unit_number"] }} ARCHITECTURE &amp; PROJECTIONS</span>
+                <h3 style="margin: 6px 0 12px; font-family: 'Plus Jakarta Sans', sans-serif;">{{ u["unit_title"] }}</h3>
+                {{ u["visual_diagram_svg"]|safe }}
+                <p style="font-size: 14px; color: var(--muted); margin-top: 10px;">{{ u["simplified_explanation"] }}</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% if not has_diagram %}
+            <div class="unit-card" style="text-align: center; padding: 40px; color: var(--muted);">
+                Interactive visual diagrams for this course will appear here.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB 3: NOTES -->
+        <div id="tab-notes" class="tab-content-panel">
+            {% for u in units %}
+            <div class="unit-card">
+                <span class="unit-badge">UNIT {{ u["unit_number"] }} NOTES</span>
+                <h3 style="margin: 6px 0 12px; font-family: 'Plus Jakarta Sans', sans-serif;">{{ u["unit_title"] }}</h3>
+                <div class="box-notes">{{ u["key_notes"] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- TAB 4: IMPORTANT QUESTIONS -->
+        <div id="tab-questions" class="tab-content-panel">
+            {% for u in units %}
+            <div class="unit-card">
+                <span class="unit-badge">UNIT {{ u["unit_number"] }} REPEATED VTU QUESTIONS</span>
+                <h3 style="margin: 6px 0 12px; font-family: 'Plus Jakarta Sans', sans-serif;">{{ u["unit_title"] }}</h3>
+                <div class="box-questions">{{ u["vtu_exam_questions"] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- TAB 5: QUIZ -->
+        <div id="tab-quiz" class="tab-content-panel">
+            {% if questions %}
+            {% for q in questions %}
+            <div class="unit-card" id="quiz-block-{{ q['id'] }}">
+                <span class="unit-badge">QUESTION {{ loop.index }}</span>
+                <h3 style="margin: 8px 0 16px; font-size: 17px; font-family: 'Plus Jakarta Sans', sans-serif;">
+                    {{ q["question_text"] }}
+                </h3>
+
+                <div class="quiz-option" onclick="selectQuizOption({{ q['id'] }}, 'A', '{{ q['correct_option'] }}')">
+                    <b>A.</b> {{ q["option_a"] }}
+                </div>
+                <div class="quiz-option" onclick="selectQuizOption({{ q['id'] }}, 'B', '{{ q['correct_option'] }}')">
+                    <b>B.</b> {{ q["option_b"] }}
+                </div>
+                <div class="quiz-option" onclick="selectQuizOption({{ q['id'] }}, 'C', '{{ q['correct_option'] }}')">
+                    <b>C.</b> {{ q["option_c"] }}
+                </div>
+                <div class="quiz-option" onclick="selectQuizOption({{ q['id'] }}, 'D', '{{ q['correct_option'] }}')">
+                    <b>D.</b> {{ q["option_d"] }}
+                </div>
+
+                <div id="quiz-feedback-{{ q['id'] }}" style="display: none; margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 13px;"></div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="unit-card" style="text-align: center; padding: 40px; color: var(--muted);">
+                Practice quiz questions for this course will be populated soon.
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- TAB 6: ASK EDUSPARK AI -->
+        <div id="tab-ai" class="tab-content-panel">
+            <div class="unit-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;">
+                    <span class="unit-badge">CONTEXTUAL AI TUTOR</span>
+                    <div style="display: flex; gap: 6px;">
+                        <button type="button" onclick="setChatModel('gemini', this)" class="chat-model-chip active" style="padding: 5px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 800; border: 1.5px solid #4285f4; background: #eef2ff; color: #1d4ed8; cursor: pointer;">
+                            <i class="fa-brands fa-google"></i> Gemini 1.5 Pro
+                        </button>
+                        <button type="button" onclick="setChatModel('gpt', this)" class="chat-model-chip" style="padding: 5px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 800; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer;">
+                            <i class="fa-solid fa-brain"></i> GPT-4o
+                        </button>
+                        <button type="button" onclick="setChatModel('claude', this)" class="chat-model-chip" style="padding: 5px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 800; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer;">
+                            <i class="fa-solid fa-microchip"></i> Claude 3.5
+                        </button>
+                    </div>
+                </div>
+
+                <h2 style="font-family: 'Plus Jakarta Sans', sans-serif; margin: 8px 0;">
+                    Ask EduSpark AI about {{ course["course_name"] }}
+                </h2>
+                <p style="color: var(--muted); font-size: 14px; margin-bottom: 14px;">
+                    Pre-loaded with <b>{{ scheme["name"] }} • {{ branch["short_name"] }} • Semester {{ course["semester"] }}</b> syllabus context.
+                </p>
+
+                <!-- Quick Prompt Chips -->
+                <div style="display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;">
+                    <button type="button" onclick="quickAsk('Draw the complete SVG visual projection diagram for Module 1')" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border-radius: 20px;">🎨 Draw SVG Diagram</button>
+                    <button type="button" onclick="quickAsk('Explain the core concept of Module 2 using an intuitive real-life analogy')" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border-radius: 20px;">💡 Real-Life Analogy</button>
+                    <button type="button" onclick="quickAsk('Give the top repeated 10-mark VTU exam question and step-by-step solution for this subject')" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border-radius: 20px;">❓ 10-Mark Exam Solution</button>
+                    <button type="button" onclick="quickAsk('Provide 5 high-yield exam revision notes for VTU SEE exam')" class="btn btn-outline" style="font-size: 12px; padding: 6px 12px; border-radius: 20px;">📝 High-Yield Notes</button>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="courseAiQuestion" class="marks-input"
+                           style="width: 100%; height: 50px; text-align: left; padding: 0 16px; font-size: 15px;"
+                           placeholder="Ask anything (e.g. 'Explain Candidate-Elimination algorithm simply' or 'Explain isometric vs true length')">
+                    <button onclick="askCourseAi({{ course['id'] }})" class="btn-syllabus" style="cursor: pointer; white-space: nowrap;">
+                        <i class="fa-solid fa-paper-plane"></i> Ask AI
+                    </button>
+                </div>
+
+                <div id="courseAiAnswer" class="ai-chat-bubble" style="display: none;"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let currentSelectedModel = 'gemini';
+        let currentChatModel = 'gemini';
+
+        function selectAiModel(model, btnElem) {
+            currentSelectedModel = model;
+            document.querySelectorAll('#globalAiModelSelector .ai-model-btn').forEach(b => {
+                b.classList.remove('active');
+                b.style.borderColor = 'var(--border)';
+                b.style.background = 'var(--surface)';
+                b.style.color = 'var(--text)';
+            });
+            btnElem.classList.add('active');
+            const colorMap = { 'gemini': '#4285f4', 'gpt': '#10a37f', 'claude': '#d97706' };
+            const bgMap = { 'gemini': '#eef2ff', 'gpt': '#ecfdf5', 'claude': '#fffbeb' };
+            btnElem.style.borderColor = colorMap[model] || 'var(--primary)';
+            btnElem.style.background = bgMap[model] || '#eef2ff';
+            btnElem.style.color = colorMap[model] || 'var(--primary)';
+
+            const labels = { 'gemini': 'Gemini', 'gpt': 'GPT-4o', 'claude': 'Claude' };
+            document.querySelectorAll('.current-model-label').forEach(el => {
+                el.textContent = labels[model] || 'AI';
+            });
+        }
+
+        function setChatModel(model, elem) {
+            currentChatModel = model;
+            document.querySelectorAll('.chat-model-chip').forEach(c => {
+                c.classList.remove('active');
+                c.style.borderColor = 'var(--border)';
+                c.style.background = 'var(--surface)';
+                c.style.color = 'var(--muted)';
+            });
+            elem.classList.add('active');
+            const colorMap = { 'gemini': '#4285f4', 'gpt': '#10a37f', 'claude': '#d97706' };
+            const bgMap = { 'gemini': '#eef2ff', 'gpt': '#ecfdf5', 'claude': '#fffbeb' };
+            elem.style.borderColor = colorMap[model];
+            elem.style.background = bgMap[model];
+            elem.style.color = colorMap[model];
+        }
+
+        function quickAsk(promptText) {
+            const input = document.getElementById('courseAiQuestion');
+            if (input) {
+                input.value = promptText;
+                input.focus();
+            }
+        }
+
+        async function triggerAiUnitVisualization(courseId, unitNumber) {
+            const titleElem = document.getElementById(`unit-title-${unitNumber}`);
+            const topic = titleElem ? titleElem.innerText.trim() : `Unit ${unitNumber}`;
+            const container = document.getElementById(`ai-vis-container-${unitNumber}`);
+            if (!container) return;
+
+            if (container.style.display === 'block') {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+            container.innerHTML = `
+                <div style="text-align: center; padding: 24px; color: var(--muted);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 26px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <p style="font-size: 14px; font-weight: 600;">Synthesizing visual mental model with <b>${currentSelectedModel.toUpperCase()}</b>...</p>
+                </div>
+            `;
+
+            try {
+                const res = await fetch('/api/ai/visualize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course_id: courseId,
+                        unit_number: unitNumber,
+                        topic: topic,
+                        ai_model: currentSelectedModel
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    container.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                            ${data.model_badge}
+                            <button onclick="document.getElementById('ai-vis-container-${unitNumber}').style.display='none'" style="background: none; border: none; font-size: 16px; color: var(--muted); cursor: pointer;">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <h3 style="font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 10px;">
+                            Visual Architecture: ${data.topic}
+                        </h3>
+                        ${data.svg_diagram}
+                        <div style="margin-top: 14px;">
+                            ${data.explanation}
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `<p style="color: #dc2626;">Unable to generate visualization.</p>`;
+                }
+            } catch (err) {
+                container.innerHTML = `<p style="color: #dc2626;">Network error connecting to AI visualizer.</p>`;
+            }
+        }
+
+        async function generateCustomAiDiagram(courseId) {
+            const input = document.getElementById('customVisConceptInput');
+            const topic = (input.value || '').trim();
+            if (!topic) {
+                alert("Please type a topic to visualize.");
+                return;
+            }
+            const output = document.getElementById('customVisOutput');
+            output.style.display = 'block';
+            output.innerHTML = `
+                <div style="text-align: center; padding: 24px; color: var(--muted);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 26px; color: var(--primary); margin-bottom: 10px;"></i>
+                    <p style="font-size: 14px; font-weight: 600;">Generating live SVG concept diagram with <b>${currentSelectedModel.toUpperCase()}</b>...</p>
+                </div>
+            `;
+
+            try {
+                const res = await fetch('/api/ai/visualize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course_id: courseId,
+                        unit_number: 1,
+                        topic: topic,
+                        ai_model: currentSelectedModel
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    output.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                            ${data.model_badge}
+                            <button onclick="document.getElementById('customVisOutput').style.display='none'" style="background: none; border: none; font-size: 16px; color: var(--muted); cursor: pointer;">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <h3 style="font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 10px;">
+                            Dynamic Visual Architecture: ${data.topic}
+                        </h3>
+                        ${data.svg_diagram}
+                        <div style="margin-top: 14px;">
+                            ${data.explanation}
+                        </div>
+                    `;
+                } else {
+                    output.innerHTML = `<p style="color: #dc2626;">Unable to generate visual diagram.</p>`;
+                }
+            } catch (err) {
+                output.innerHTML = `<p style="color: #dc2626;">Network error connecting to AI visualizer.</p>`;
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content-panel').forEach(panel => panel.classList.remove('active'));
+
+            event.currentTarget.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        async function toggleUnitMastery(courseId, unitId) {
+            const isChecked = document.getElementById(`check-unit-${unitId}`).checked;
+            try {
+                await fetch('/api/unit/toggle-progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        course_id: courseId,
+                        unit_id: unitId,
+                        is_completed: isChecked
+                    })
+                });
+            } catch (err) {
+                console.error("Error saving progress:", err);
+            }
+        }
+
+        function selectQuizOption(qid, choice, correct) {
+            const block = document.getElementById(`quiz-block-${qid}`);
+            const feedback = document.getElementById(`quiz-feedback-${qid}`);
+            const options = block.querySelectorAll('.quiz-option');
+
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+                if (opt.textContent.trim().startsWith(correct + '.')) {
+                    opt.classList.add('correct');
+                }
+            });
+
+            feedback.style.display = 'block';
+            if (choice === correct) {
+                feedback.style.background = '#dcfce7';
+                feedback.style.color = '#15803d';
+                feedback.innerHTML = `<b>Correct Answer!</b> Well done.`;
+            } else {
+                feedback.style.background = '#fee2e2';
+                feedback.style.color = '#b91c1c';
+                feedback.innerHTML = `<b>Incorrect.</b> Option ${correct} is the correct choice.`;
+            }
+        }
+
+        async function askCourseAi(courseId) {
+            const input = document.getElementById('courseAiQuestion');
+            const q = input.value.trim();
+            if (!q) return;
+
+            const ansBox = document.getElementById('courseAiAnswer');
+            ansBox.style.display = 'block';
+            ansBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Analyzing syllabus context and formulating explanation with ${currentChatModel.toUpperCase()}...`;
+
+            try {
+                const res = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question: q, course_id: courseId, ai_model: currentChatModel })
+                });
+                const data = await res.json();
+                ansBox.innerHTML = data.answer;
+            } catch (err) {
+                ansBox.innerHTML = 'Unable to reach AI tutor. Please check your connection.';
+            }
+        }
+
+        // Theme Toggle
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+</body>
+
+</html>

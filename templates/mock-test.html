@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mock Test | EduSpark</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='mock-test.css') }}">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+
+<body>
+
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="logo-icon">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+
+            Edu<span>Spark</span>
+
+        </div>
+
+
+        <nav class="side-nav">
+
+            <a href="{{ url_for('dashboard') }}">
+
+                <i class="fa-solid fa-house"></i>
+
+                Dashboard
+
+            </a>
+
+
+            <a class="active" href="{{ url_for('mock_test') }}">
+
+                <i class="fa-solid fa-file-circle-check"></i>
+
+                Mock Tests
+
+            </a>
+
+
+            <a href="{{ url_for('profile') }}">
+
+                <i class="fa-solid fa-user"></i>
+
+                Profile
+
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-bottom">
+
+            <a href="{{ url_for('logout') }}" class="logout">
+
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+                Logout
+
+            </a>
+
+        </div>
+
+    </aside>
+
+
+
+    <main class="main mock-main">
+
+
+        <div class="test-topbar">
+
+            <a href="{{ url_for('dashboard') }}" class="back-link">
+
+                <i class="fa-solid fa-arrow-left"></i>
+
+                Dashboard
+
+            </a>
+
+
+            <div class="test-info">
+
+                <span>
+                    PHYSICS
+                </span>
+
+                <strong>
+                    Mock Test — Laws of Motion
+                </strong>
+
+            </div>
+
+
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+
+                <div class="timer">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="timer">
+                        10:00
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+
+
+        <div class="test-layout">
+
+
+            <div class="question-area">
+
+
+                <div class="test-progress">
+
+                    <div>
+
+                        <span>
+                            Question
+                        </span>
+
+                        <strong>
+                            <span id="currentQuestion">
+                                1
+                            </span>
+                            / 5
+                        </strong>
+
+                    </div>
+
+
+                    <div class="question-progress">
+
+                        <div id="questionProgress">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div id="quizContainer">
+
+
+                    <!-- Question 1 -->
+
+                    <div class="question-card active-question" data-question="1">
+
+                        <span class="question-number">
+                            QUESTION 01
+                        </span>
+
+                        <h2>
+                            Which of the following represents
+                            Newton's First Law of Motion?
+                        </h2>
+
+
+                        <div class="options">
+
+                            <label class="option">
+
+                                <input type="radio" name="q1" value="A">
+
+                                <span class="option-letter">
+                                    A
+                                </span>
+
+                                <span>
+                                    Every action has an equal
+                                    and opposite reaction.
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q1" value="B">
+
+                                <span class="option-letter">
+                                    B
+                                </span>
+
+                                <span>
+                                    An object remains at rest or
+                                    in uniform motion unless acted
+                                    upon by an external force.
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q1" value="C">
+
+                                <span class="option-letter">
+                                    C
+                                </span>
+
+                                <span>
+                                    Force equals mass multiplied
+                                    by acceleration.
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q1" value="D">
+
+                                <span class="option-letter">
+                                    D
+                                </span>
+
+                                <span>
+                                    Momentum is always conserved.
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Question 2 -->
+
+                    <div class="question-card" data-question="2">
+
+                        <span class="question-number">
+                            QUESTION 02
+                        </span>
+
+                        <h2>
+                            What is the SI unit of force?
+                        </h2>
+
+
+                        <div class="options">
+
+                            <label class="option">
+
+                                <input type="radio" name="q2" value="A">
+
+                                <span class="option-letter">
+                                    A
+                                </span>
+
+                                <span>
+                                    Joule
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q2" value="B">
+
+                                <span class="option-letter">
+                                    B
+                                </span>
+
+                                <span>
+                                    Watt
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q2" value="C">
+
+                                <span class="option-letter">
+                                    C
+                                </span>
+
+                                <span>
+                                    Newton
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q2" value="D">
+
+                                <span class="option-letter">
+                                    D
+                                </span>
+
+                                <span>
+                                    Pascal
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Question 3 -->
+
+                    <div class="question-card" data-question="3">
+
+                        <span class="question-number">
+                            QUESTION 03
+                        </span>
+
+                        <h2>
+                            If mass is constant, force increases
+                            when acceleration...
+                        </h2>
+
+
+                        <div class="options">
+
+                            <label class="option">
+
+                                <input type="radio" name="q3" value="A">
+
+                                <span class="option-letter">
+                                    A
+                                </span>
+
+                                <span>
+                                    Increases
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q3" value="B">
+
+                                <span class="option-letter">
+                                    B
+                                </span>
+
+                                <span>
+                                    Decreases
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q3" value="C">
+
+                                <span class="option-letter">
+                                    C
+                                </span>
+
+                                <span>
+                                    Becomes zero
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q3" value="D">
+
+                                <span class="option-letter">
+                                    D
+                                </span>
+
+                                <span>
+                                    Remains unchanged
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Question 4 -->
+
+                    <div class="question-card" data-question="4">
+
+                        <span class="question-number">
+                            QUESTION 04
+                        </span>
+
+                        <h2>
+                            Which quantity is a vector?
+                        </h2>
+
+
+                        <div class="options">
+
+                            <label class="option">
+
+                                <input type="radio" name="q4" value="A">
+
+                                <span class="option-letter">
+                                    A
+                                </span>
+
+                                <span>
+                                    Mass
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q4" value="B">
+
+                                <span class="option-letter">
+                                    B
+                                </span>
+
+                                <span>
+                                    Time
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q4" value="C">
+
+                                <span class="option-letter">
+                                    C
+                                </span>
+
+                                <span>
+                                    Temperature
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q4" value="D">
+
+                                <span class="option-letter">
+                                    D
+                                </span>
+
+                                <span>
+                                    Force
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- Question 5 -->
+
+                    <div class="question-card" data-question="5">
+
+                        <span class="question-number">
+                            QUESTION 05
+                        </span>
+
+                        <h2>
+                            What happens when the net force
+                            acting on an object is zero?
+                        </h2>
+
+
+                        <div class="options">
+
+                            <label class="option">
+
+                                <input type="radio" name="q5" value="A">
+
+                                <span class="option-letter">
+                                    A
+                                </span>
+
+                                <span>
+                                    It must accelerate.
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q5" value="B">
+
+                                <span class="option-letter">
+                                    B
+                                </span>
+
+                                <span>
+                                    It remains at rest or moves
+                                    with constant velocity.
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q5" value="C">
+
+                                <span class="option-letter">
+                                    C
+                                </span>
+
+                                <span>
+                                    Its mass becomes zero.
+                                </span>
+
+                            </label>
+
+
+                            <label class="option">
+
+                                <input type="radio" name="q5" value="D">
+
+                                <span class="option-letter">
+                                    D
+                                </span>
+
+                                <span>
+                                    Its velocity becomes infinite.
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <div class="question-actions">
+
+                    <button id="previousBtn" class="secondary-test-btn">
+
+                        <i class="fa-solid fa-arrow-left"></i>
+
+                        Previous
+
+                    </button>
+
+
+                    <button id="nextBtn" class="primary-test-btn">
+
+                        Next
+
+                        <i class="fa-solid fa-arrow-right"></i>
+
+                    </button>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- QUESTION NAVIGATION -->
+
+            <aside class="question-sidebar">
+
+                <div class="test-summary">
+
+                    <h3>
+                        Test Overview
+                    </h3>
+
+                    <div class="summary-item">
+
+                        <span>
+                            Questions
+                        </span>
+
+                        <strong>
+                            5
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span>
+                            Duration
+                        </span>
+
+                        <strong>
+                            10 min
+                        </strong>
+
+                    </div>
+
+                    <div class="summary-item">
+
+                        <span>
+                            Total Marks
+                        </span>
+
+                        <strong>
+                            5
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div class="question-navigator">
+
+                    <h3>
+                        Questions
+                    </h3>
+
+
+                    <div class="question-buttons">
+
+                        <button class="q-btn active">
+                            1
+                        </button>
+
+                        <button class="q-btn">
+                            2
+                        </button>
+
+                        <button class="q-btn">
+                            3
+                        </button>
+
+                        <button class="q-btn">
+                            4
+                        </button>
+
+                        <button class="q-btn">
+                            5
+                        </button>
+
+                    </div>
+
+
+                    <div class="legend">
+
+                        <span>
+                            <i class="answered"></i>
+                            Answered
+                        </span>
+
+                        <span>
+                            <i class="unanswered"></i>
+                            Unanswered
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+        </div>
+
+
+        <!-- RESULT -->
+
+        <div id="resultScreen" class="result-screen">
+
+            <div class="result-icon">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+
+            <span>
+                MOCK TEST COMPLETED
+            </span>
+
+            <h1>
+                Great job!
+            </h1>
+
+            <p>
+                Here's your performance.
+            </p>
+
+
+            <div class="score">
+
+                <strong id="score">
+                    0
+                </strong>
+
+                <span>
+                    / 5
+                </span>
+
+            </div>
+
+
+            <div class="percentage" id="percentage">
+                0%
+            </div>
+
+
+            <a href="{{ url_for('dashboard') }}" class="primary-test-btn">
+
+                Back to Dashboard
+
+            </a>
+
+        </div>
+
+
+    </main>
+
+
+    <script src="{{ url_for('static', filename='mock-test.js') }}">
+    </script>
+
+    <script>
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+
+</body>
+
+</html>

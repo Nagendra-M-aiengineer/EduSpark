@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Learning Center | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .visual-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+        @media (max-width: 640px) {
+            .visual-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .visual-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+        .visual-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+        .visual-header {
+            padding: 18px 20px;
+            background: var(--surface-alt);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .visual-badge {
+            background: rgba(99, 102, 241, 0.12);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 999px;
+            text-transform: uppercase;
+        }
+        .visual-svg-container {
+            padding: 24px;
+            background: rgba(248, 250, 252, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 220px;
+            overflow-x: auto;
+        }
+        body.dark-theme .visual-svg-container {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .visual-svg-container svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .visual-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .visual-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .visual-analogy {
+            background: rgba(245, 158, 11, 0.08);
+            border-left: 3px solid #f59e0b;
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            color: var(--text);
+            line-height: 1.5;
+        }
+        .visual-expl {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a class="active" href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">{{ user["branch_code"] }} • Sem {{ user["current_sem"] }}</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="welcome-box">
+                <div class="welcome-left">
+                    <div class="vtu-tag">
+                        <i class="fa-solid fa-eye"></i> VISUAL LEARNING ENGINE
+                    </div>
+                    <h1>Interactive Diagrams &amp; Visual Intuition</h1>
+                    <p>Engineered to replace 500-page dry textbook descriptions with animated workflows, state transitions, and intuitive SVG system architecture diagrams for every concept in the VTU curriculum.</p>
+                </div>
+            </div>
+
+            <!-- Toolbar: Real-time Live Search & Semester Filters -->
+            <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 22px; margin: 24px 0 16px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 14px;">
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 260px; position: relative;">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 14px; color: var(--muted);"></i>
+                        <input type="text" id="visualSearchInput" oninput="filterVisualsRealtime()" placeholder="Search any concept, formula, or subject (e.g. 'Orthographic', 'Neural', 'Stack', 'Isometric', 'HDFS')..." class="marks-input" style="width: 100%; height: 44px; text-align: left; padding-left: 40px; font-size: 14px;">
+                    </div>
+                    <span style="font-size: 13px; color: var(--muted); font-weight: 600;" id="visualCountBadge">
+                        Showing all diagrams
+                    </span>
+                </div>
+                <!-- Semester Filter Pills -->
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="semFilterPills">
+                    <button type="button" class="sem-filter-pill active" onclick="setSemFilter(0, this)" style="padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid var(--primary); background: var(--primary); color: white; cursor: pointer;">
+                        All Semesters
+                    </button>
+                    {% for sm in range(1, 9) %}
+                    <button type="button" class="sem-filter-pill" onclick="setSemFilter({{ sm }}, this)" style="padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; border: 1px solid var(--border); background: var(--surface); color: var(--muted); cursor: pointer;">
+                        Sem {{ sm }}
+                    </button>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="visual-grid" id="visualGridContainer">
+                {% if diagrams %}
+                    {% for d in diagrams %}
+                    <div class="visual-card" data-semester="{{ d['semester'] }}" data-title="{{ d['unit_title'] }}" data-course="{{ d['course_code'] }} - {{ d['course_name'] }}" data-search="{{ (d['course_code'] ~ ' ' ~ d['course_name'] ~ ' ' ~ d['unit_title'] ~ ' ' ~ (d['simplified_explanation'] or ''))|lower }}">
+                        <div class="visual-header">
+                            <div>
+                                <strong style="font-size: 14px; color: var(--primary); font-family: monospace;">{{ d['course_code'] }}</strong>
+                                <span style="font-size: 12px; color: var(--text); font-weight: 700; margin-left: 6px;">{{ d['course_name'] }}</span>
+                            </div>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <span class="visual-badge">Sem {{ d['semester'] }}</span>
+                                <span class="visual-badge" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">Unit {{ d['unit_number'] }}</span>
+                            </div>
+                        </div>
+                        <div class="visual-svg-container" style="cursor: pointer;" onclick="openDiagramModal(this)">
+                            {{ d['visual_diagram_svg'] | safe }}
+                        </div>
+                        <div class="visual-body">
+                            <div class="visual-title" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <span>{{ d['unit_title'] }}</span>
+                                <button type="button" onclick="openDiagramModal(this)" class="btn btn-outline" style="font-size: 11px; padding: 4px 8px; white-space: nowrap;" title="Inspect Fullscreen">
+                                    <i class="fa-solid fa-expand"></i> Inspect
+                                </button>
+                            </div>
+                            {% if d['real_life_analogy'] %}
+                            <div class="visual-analogy">
+                                <i class="fa-solid fa-lightbulb" style="color: #f59e0b; margin-right: 4px;"></i>
+                                <b>Real-Life Analogy:</b> {{ d['real_life_analogy'] }}
+                            </div>
+                            {% endif %}
+                            <div class="visual-expl">
+                                {{ d['simplified_explanation'] }}
+                            </div>
+                            <div style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end;">
+                                <a href="{{ url_for('course_detail', course_id=d.get('course_id', 1)) }}" class="continue-btn" style="font-size: 12px; padding: 6px 12px; text-decoration: none;">
+                                    Study Unit in Course Portal <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="grid-column: 1 / -1; padding: 48px; text-align: center; background: var(--surface); border-radius: var(--radius); border: 1px dashed var(--border);">
+                        <i class="fa-solid fa-shapes" style="font-size: 40px; color: var(--muted); margin-bottom: 12px;"></i>
+                        <h3>Visual Diagrams Loading</h3>
+                        <p style="color: var(--muted); max-width: 500px; margin: 8px auto;">Visual diagrams for your selected semester are actively being rendered. Open any individual course from your Academic Dashboard to explore its full visual unit representations.</p>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary" style="margin-top: 16px; display: inline-flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-arrow-left"></i> Return to Dashboard
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <!-- FULLSCREEN DIAGRAM INSPECTION MODAL -->
+    <div id="diagramInspectModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; max-width: 900px; width: 100%; padding: 28px; box-shadow: var(--shadow-lg); max-height: 92vh; overflow-y: auto; position: relative;">
+            <button onclick="document.getElementById('diagramInspectModal').style.display='none'" style="position: absolute; top: 18px; right: 20px; background: none; border: none; font-size: 20px; color: var(--muted); cursor: pointer;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div style="margin-bottom: 16px;">
+                <span id="modalCourseInfo" style="font-size: 12px; font-weight: 800; color: var(--primary); text-transform: uppercase;"></span>
+                <h2 id="modalDiagramTitle" style="font-size: 20px; font-weight: 800; color: var(--text); margin-top: 4px;"></h2>
+            </div>
+            <div id="modalSvgContainer" style="background: var(--surface-alt); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; justify-content: center; align-items: center; overflow-x: auto;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);">
+                <span style="font-size: 12px; color: var(--muted);"><i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Official VTU CBCS Vector Schematic</span>
+                <button type="button" onclick="document.getElementById('diagramInspectModal').style.display='none'" class="btn btn-primary" style="font-size: 13px; padding: 8px 18px;">
+                    Close Inspector
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSemFilter = 0;
+
+        function setSemFilter(sem, btn) {
+            currentSemFilter = sem;
+            document.querySelectorAll('#semFilterPills .sem-filter-pill').forEach(b => {
+                b.classList.remove('active');
+                b.style.background = 'var(--surface)';
+                b.style.borderColor = 'var(--border)';
+                b.style.color = 'var(--muted)';
+            });
+            btn.classList.add('active');
+            btn.style.background = 'var(--primary)';
+            btn.style.borderColor = 'var(--primary)';
+            btn.style.color = 'white';
+            filterVisualsRealtime();
+        }
+
+        function filterVisualsRealtime() {
+            const query = (document.getElementById('visualSearchInput').value || '').trim().toLowerCase();
+            const cards = document.querySelectorAll('#visualGridContainer .visual-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardSem = parseInt(card.getAttribute('data-semester') || '0');
+                const searchData = (card.getAttribute('data-search') || '').toLowerCase();
+
+                const matchesSem = (currentSemFilter === 0 || cardSem === currentSemFilter);
+                const matchesQuery = (!query || searchData.includes(query));
+
+                if (matchesSem && matchesQuery) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const badge = document.getElementById('visualCountBadge');
+            if (badge) {
+                badge.textContent = `Showing ${visibleCount} diagrams`;
+            }
+        }
+
+        function openDiagramModal(elem) {
+            const card = elem.closest('.visual-card');
+            if (!card) return;
+            const title = card.getAttribute('data-title') || '';
+            const course = card.getAttribute('data-course') || '';
+            const svgCont = card.querySelector('.visual-svg-container');
+            if (!svgCont) return;
+            document.getElementById('modalCourseInfo').textContent = course;
+            document.getElementById('modalDiagramTitle').textContent = title;
+            document.getElementById('modalSvgContainer').innerHTML = svgCont.innerHTML;
+            document.getElementById('diagramInspectModal').style.display = 'flex';
+        }
+
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTU NPTEL & Swayam Portal | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .nptel-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        @media (max-width: 992px) {
+            .nptel-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .nptel-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+        .week-pill {
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a class="active" href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">{{ user["branch_code"] }} • Sem {{ user["current_sem"] }}</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="welcome-box">
+                <div class="welcome-left">
+                    <div class="vtu-tag">
+                        <i class="fa-solid fa-laptop-code"></i> VTU CREDIT TRANSFER RECOGNIZED
+                    </div>
+                    <h1>NPTEL & Swayam Online Course Hub</h1>
+                    <p>Track your 8-week and 12-week NPTEL / Swayam MOOCs eligible for VTU CBCS credit transfer, semester 8 elective waiver, and Honours degree qualification.</p>
+                </div>
+            </div>
+
+            <div class="nptel-layout">
+                <!-- FORM -->
+                <div class="nptel-card">
+                    <h3 style="font-size: 18px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Add Online MOOC
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Enrolled NPTEL/Swayam course.</p>
+
+                    <form method="POST" action="{{ url_for('nptel') }}">
+                        <div class="form-group">
+                            <label>Course Title *</label>
+                            <input type="text" name="course_name" class="form-control" placeholder="e.g. Deep Learning / Cloud Computing" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Platform / Provider *</label>
+                            <select name="provider" class="form-control">
+                                <option value="NPTEL (IIT Madras)">NPTEL (IIT Madras)</option>
+                                <option value="NPTEL (IIT Kharagpur)">NPTEL (IIT Kharagpur)</option>
+                                <option value="NPTEL (IIT Bombay)">NPTEL (IIT Bombay)</option>
+                                <option value="Swayam Portal">Swayam Portal</option>
+                                <option value="VTU e-Learning">VTU e-Learning</option>
+                                <option value="Coursera for Campus">Coursera for Campus</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration *</label>
+                            <select name="duration" class="form-control">
+                                <option value="12 Weeks">12 Weeks (3 Credits)</option>
+                                <option value="8 Weeks">8 Weeks (2 Credits)</option>
+                                <option value="4 Weeks">4 Weeks (1 Credit)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>VTU Equivalent Credits *</label>
+                            <input type="number" name="credits" class="form-control" min="1" max="4" value="3" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Official Course Link *</label>
+                            <input type="url" name="course_url" class="form-control" value="https://onlinecourses.nptel.ac.in" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Enrollment ID / Application No.</label>
+                            <input type="text" name="enrollment_info" class="form-control" placeholder="e.g. NOC26CS45S12345678">
+                        </div>
+                        <div class="form-group">
+                            <label>Weekly Learning Roadmap</label>
+                            <textarea name="weekly_plan" class="form-control" rows="3" placeholder="e.g. Week 1-3: Foundations, Week 4-8: Algorithms, Week 9-12: Advanced topics & Exam Prep"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Assignment Submission Tracker</label>
+                            <input type="text" name="assignment_tracker" class="form-control" placeholder="e.g. 8/12 Assignments Submitted (Score: 88%)">
+                        </div>
+                        <div class="form-group">
+                            <label>Course Status *</label>
+                            <select name="status" class="form-control">
+                                <option value="Enrolled">Enrolled</option>
+                                <option value="In Progress" selected>In Progress</option>
+                                <option value="Exam Registered">Proctored Exam Registered</option>
+                                <option value="Certified (Elite)">Certified (Elite)</option>
+                                <option value="Certified (Gold)">Certified (Gold)</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Save Course Record
+                        </button>
+                    </form>
+                </div>
+
+                <!-- COURSES LIST -->
+                <div>
+                    {% if nptel_courses %}
+                        {% for c in nptel_courses %}
+                        <div class="nptel-card">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+                                <div>
+                                    <h3 style="font-size: 20px; font-weight: 800; color: var(--text);">{{ c['course_name'] }}</h3>
+                                    <div style="font-size: 14px; color: var(--primary); font-weight: 700; margin-top: 2px;">
+                                        {{ c['provider'] }} • {{ c['duration'] }} • {{ c['credits'] }} VTU Credits
+                                    </div>
+                                </div>
+                                <span style="font-size: 12px; font-weight: 800; padding: 6px 14px; border-radius: 999px; background: rgba(16, 185, 129, 0.12); color: #10b981; text-transform: uppercase;">
+                                    {{ c['status'] }}
+                                </span>
+                            </div>
+
+                            <div style="background: var(--surface-alt); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+                                    <span style="color: var(--muted);"><i class="fa-solid fa-id-card"></i> Enrollment ID:</span>
+                                    <strong style="color: var(--text);">{{ c['enrollment_info'] or 'Pending Registration' }}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px;">
+                                    <span style="color: var(--muted);"><i class="fa-solid fa-list-check"></i> Assignment Status:</span>
+                                    <strong style="color: #10b981;">{{ c['assignment_tracker'] or 'Track in progress' }}</strong>
+                                </div>
+                                {% if c['weekly_plan'] %}
+                                <div style="margin-top: 10px; font-size: 13px; color: var(--text); border-top: 1px solid var(--border); padding-top: 8px;">
+                                    <strong><i class="fa-solid fa-calendar-days" style="color: var(--primary);"></i> Learning Roadmap:</strong>
+                                    <p style="color: var(--muted); margin-top: 4px;">{{ c['weekly_plan'] }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                                <a href="{{ c['course_url'] }}" target="_blank" class="btn btn-primary" style="font-size: 13px; padding: 8px 16px;">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Swayam Portal
+                                </a>
+                                <button class="btn btn-outline" style="font-size: 13px; padding: 8px 14px;">
+                                    <i class="fa-solid fa-file-arrow-up"></i> Upload NPTEL Certificate
+                                </button>
+                                <button class="btn btn-outline" style="font-size: 13px; padding: 8px 14px;">
+                                    <i class="fa-solid fa-clipboard-check"></i> Credit Transfer Form
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="nptel-card" style="text-align: center; padding: 48px;">
+                            <i class="fa-solid fa-laptop-code" style="font-size: 42px; color: var(--muted); margin-bottom: 12px;"></i>
+                            <h3>No NPTEL MOOCs Added</h3>
+                            <p style="color: var(--muted); max-width: 450px; margin: 8px auto 20px;">Use the form to record your Swayam / NPTEL online course details for semester 8 elective requirements and VTU credit transfer.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+</body>
+</html>

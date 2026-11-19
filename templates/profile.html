@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTU Academic Profile | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .profile-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        @media (max-width: 900px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a class="active" href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">{{ user["branch_code"] }} • Sem {{ user["current_sem"] }}</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="welcome-box">
+                <div class="welcome-left">
+                    <div class="vtu-tag">
+                        <i class="fa-solid fa-id-badge"></i> VTU STUDENT CREDENTIALS
+                    </div>
+                    <h1>Student Academic Profile & Settings</h1>
+                    <p>Manage your official VTU registration details. Your academic dashboard, curriculum subjects, and CGPA formulas dynamically re-align when you update your branch or scheme.</p>
+                </div>
+            </div>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, msg in messages %}
+                    <div style="padding: 12px 18px; border-radius: 10px; margin-top: 16px; font-size: 14px; font-weight: 600; {% if category == 'error' %}background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid #dc2626;{% else %}background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid #10b981;{% endif %}">
+                        <i class="fa-solid fa-circle-check"></i> {{ msg }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="profile-layout">
+                <!-- LEFT KPI & AVATAR -->
+                <div>
+                    <div class="profile-card" style="text-align: center; margin-bottom: 20px;">
+                        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #818cf8); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: white; margin: 0 auto 14px; box-shadow: 0 8px 20px var(--primary-glow);">
+                            {{ user["avatar"] }}
+                        </div>
+                        <h2 style="font-size: 20px; font-weight: 800; color: var(--text);">{{ user["name"] }}</h2>
+                        <div style="font-size: 13px; color: var(--muted); margin-top: 2px;">{{ user["email"] }}</div>
+                        <div style="display: inline-block; margin-top: 10px; padding: 4px 12px; border-radius: 999px; background: rgba(99, 102, 241, 0.12); color: var(--primary); font-size: 12px; font-weight: 800;">
+                            USN: {{ user["usn"] }}
+                        </div>
+                    </div>
+
+                    <div class="profile-card">
+                        <h4 style="font-size: 13px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; letter-spacing: 0.5px;">Academic Summary</h4>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;">
+                            <span style="color: var(--muted);">Overall CGPA</span>
+                            <strong style="color: var(--primary); font-size: 15px;">{{ gpa_data.cgpa }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;">
+                            <span style="color: var(--muted);">VTU Percentage</span>
+                            <strong style="color: #10b981; font-size: 15px;">{{ gpa_data.percentage }}%</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;">
+                            <span style="color: var(--muted);">Completed Credits</span>
+                            <strong>{{ gpa_data.total_credits_earned }} / {{ gpa_data.total_credits_scheme }}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 10px 0; font-size: 13px;">
+                            <span style="color: var(--muted);">Academic Progress</span>
+                            <strong>{{ gpa_data.progress_percentage }}%</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT EDIT FORM -->
+                <div class="profile-card">
+                    <h3 style="font-size: 18px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-user-pen" style="color: var(--primary);"></i> Edit Academic Details
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 24px;">Ensure your VTU USN, branch, and scheme match your university hall ticket.</p>
+
+                    <form method="POST" action="{{ url_for('profile') }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Full Name *</label>
+                                <input type="text" name="name" class="form-control" value="{{ user['name'] }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>VTU USN *</label>
+                                <input type="text" name="usn" class="form-control" value="{{ user['usn'] }}" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Engineering College Name *</label>
+                            <input type="text" name="college" class="form-control" value="{{ user['college'] }}" required>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Engineering Branch *</label>
+                                <select name="branch_code" class="form-control">
+                                    {% for b in branches %}
+                                    <option value="{{ b['code'] }}" {% if b['code'] == user['branch_code'] %}selected{% endif %}>
+                                        {{ b['name'] }} ({{ b['short_name'] }})
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>VTU Scheme *</label>
+                                <select name="scheme_code" class="form-control">
+                                    {% for s in schemes %}
+                                    <option value="{{ s['code'] }}" {% if s['code'] == user['scheme_code'] %}selected{% endif %}>
+                                        {{ s['name'] }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Current Academic Year *</label>
+                                <select name="current_year" class="form-control">
+                                    <option value="1" {% if user['current_year'] == 1 %}selected{% endif %}>1st Year (BE)</option>
+                                    <option value="2" {% if user['current_year'] == 2 %}selected{% endif %}>2nd Year (BE)</option>
+                                    <option value="3" {% if user['current_year'] == 3 %}selected{% endif %}>3rd Year (BE)</option>
+                                    <option value="4" {% if user['current_year'] == 4 %}selected{% endif %}>4th Year (BE)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Current Semester *</label>
+                                <select name="current_sem" class="form-control">
+                                    {% for sm in range(1, 9) %}
+                                    <option value="{{ sm }}" {% if user['current_sem'] == sm %}selected{% endif %}>Semester {{ sm }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="padding: 12px 24px; margin-top: 12px;">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Academic Profile
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

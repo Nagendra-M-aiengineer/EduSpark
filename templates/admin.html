@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VTU Curriculum Administration | EduSpark</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 24px;
+            margin-top: 24px;
+        }
+        @media (max-width: 992px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .admin-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--surface-alt);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a class="active" href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">VTU Academic Admin</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="welcome-box">
+                <div class="welcome-left">
+                    <div class="vtu-tag">
+                        <i class="fa-solid fa-lock"></i> VTU CURRICULUM MANAGEMENT
+                    </div>
+                    <h1>Academic Structure & Syllabus Administration</h1>
+                    <p>Manage schemes, branches, course mappings, official VTU PDF links, and update curriculum structures without code changes.</p>
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 24px 0;">
+                <div class="admin-card" style="padding: 18px;">
+                    <div style="font-size: 12px; color: var(--muted); text-transform: uppercase;">Mapped Courses</div>
+                    <div style="font-size: 28px; font-weight: 800; color: var(--primary);">{{ courses|length }}</div>
+                </div>
+                <div class="admin-card" style="padding: 18px;">
+                    <div style="font-size: 12px; color: var(--muted); text-transform: uppercase;">Enrolled Students</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #10b981;">{{ students_count }}</div>
+                </div>
+                <div class="admin-card" style="padding: 18px;">
+                    <div style="font-size: 12px; color: var(--muted); text-transform: uppercase;">Active Schemes</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #f59e0b;">{{ schemes|length }}</div>
+                </div>
+                <div class="admin-card" style="padding: 18px;">
+                    <div style="font-size: 12px; color: var(--muted); text-transform: uppercase;">Supported Branches</div>
+                    <div style="font-size: 28px; font-weight: 800; color: #ec4899;">{{ branches|length }}</div>
+                </div>
+            </div>
+
+            <div class="admin-layout">
+                <!-- ADD COURSE FORM -->
+                <div class="admin-card">
+                    <h3 style="font-size: 18px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Add Curriculum Subject
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Map a course into the dynamic scheme engine.</p>
+
+                    <form method="POST" action="{{ url_for('admin_panel') }}">
+                        <input type="hidden" name="action" value="add_course">
+
+                        <div class="form-group">
+                            <label>VTU Scheme *</label>
+                            <select name="scheme_code" class="form-control">
+                                {% for s in schemes %}
+                                <option value="{{ s['code'] }}">{{ s['name'] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Branch *</label>
+                            <select name="branch_code" class="form-control">
+                                {% for b in branches %}
+                                <option value="{{ b['code'] }}">{{ b['name'] }} ({{ b['short_name'] }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Semester (1 to 8) *</label>
+                            <input type="number" name="semester" class="form-control" min="1" max="8" value="6" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Course Code *</label>
+                            <input type="text" name="course_code" class="form-control" placeholder="e.g. 21CS61 / BAD601" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Course Name *</label>
+                            <input type="text" name="course_name" class="form-control" placeholder="e.g. Big Data Analytics" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Course Type</label>
+                            <select name="course_type" class="form-control">
+                                <option value="PCC">Professional Core Course (PCC)</option>
+                                <option value="IPCC">Integrated Professional Core Course (IPCC)</option>
+                                <option value="PEC">Professional Elective Course (PEC)</option>
+                                <option value="OEC">Open Elective Course (OEC)</option>
+                                <option value="AEC">Ability Enhancement Course (AEC)</option>
+                                <option value="HSMC">Humanities & Social Sciences (HSMC)</option>
+                                <option value="BSC">Basic Science Course (BSC)</option>
+                                <option value="ESC">Engineering Science Course (ESC)</option>
+                                <option value="PROJECT">Project / Internship</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Credits *</label>
+                            <input type="number" step="0.5" name="credits" class="form-control" value="3.0" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Official VTU Syllabus PDF Link</label>
+                            <input type="url" name="syllabus_url" class="form-control" placeholder="https://vtu.ac.in/...">
+                        </div>
+                        <div class="form-group">
+                            <label>Short Description</label>
+                            <textarea name="description" class="form-control" rows="2" placeholder="Course objectives and scope..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; margin-top: 10px;">
+                            <i class="fa-solid fa-plus"></i> Save Course to Engine
+                        </button>
+                    </form>
+                </div>
+
+                <!-- TABLE OF COURSES & QUICK UPDATE -->
+                <div class="admin-card">
+                    <h3 style="font-size: 18px; margin-bottom: 6px;">
+                        <i class="fa-solid fa-table-list" style="color: var(--primary);"></i> Current Scheme Mappings
+                    </h3>
+                    <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">Review and manage official syllabus links.</p>
+
+                    <div style="overflow-x: auto;">
+                        <table class="vtu-table">
+                            <thead>
+                                <tr>
+                                    <th>Code & Subject</th>
+                                    <th>Scheme / Branch</th>
+                                    <th>Sem</th>
+                                    <th>Credits</th>
+                                    <th>Official Syllabus</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in courses %}
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 700; color: var(--text);">{{ c['course_code'] }}</div>
+                                        <div style="font-size: 12px; color: var(--muted);">{{ c['course_name'] }}</div>
+                                    </td>
+                                    <td style="font-size: 12px;">{{ c['scheme_name'] }} • {{ c['branch_name'] }}</td>
+                                    <td>Sem {{ c['semester'] }}</td>
+                                    <td>{{ c['credits'] }}</td>
+                                    <td>
+                                        {% if c['syllabus_url'] %}
+                                            <a href="{{ c['syllabus_url'] }}" target="_blank" style="color: #10b981; font-weight: 700; font-size: 12px;">
+                                                <i class="fa-solid fa-link"></i> Linked
+                                            </a>
+                                        {% else %}
+                                            <span style="color: var(--muted); font-size: 12px;">Unavailable</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('admin_panel') }}" style="display: flex; gap: 6px;">
+                                            <input type="hidden" name="action" value="update_syllabus_link">
+                                            <input type="hidden" name="course_id" value="{{ c['id'] }}">
+                                            <input type="url" name="syllabus_url" value="{{ c['syllabus_url'] or '' }}" placeholder="Paste VTU URL..." style="padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface-alt); color: var(--text); font-size: 12px; width: 140px;">
+                                            <button type="submit" class="btn btn-outline" style="padding: 4px 8px; font-size: 11px;">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+    </script>
+</body>
+</html>

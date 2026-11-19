@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSpark AI Study Buddy | VTU Tutor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 180px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            margin-top: 20px;
+        }
+        .chat-header {
+            padding: 16px 24px;
+            background: var(--surface-alt);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .msg {
+            max-width: 80%;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .msg-ai {
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+            border-top-left-radius: 4px;
+        }
+        .msg-user {
+            background: linear-gradient(135deg, var(--primary), #6366f1);
+            color: white;
+            align-self: flex-end;
+            border-top-right-radius: 4px;
+        }
+        .chat-input-bar {
+            padding: 16px 24px;
+            background: var(--surface-alt);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .chat-input:focus {
+            border-color: var(--primary);
+        }
+        .quick-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .chip {
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--surface-alt);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .chip:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            Edu<span>Spark</span>
+        </div>
+        <nav class="side-nav">
+            <a href="{{ url_for('dashboard') }}">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>Academic Portal</span>
+            </a>
+            <a href="{{ url_for('syllabus') }}">
+                <i class="fa-solid fa-book-open"></i>
+                <span>VTU Syllabus</span>
+            </a>
+            <a href="{{ url_for('visual_learning') }}">
+                <i class="fa-solid fa-shapes"></i>
+                <span>Visual Learning</span>
+            </a>
+            <a href="{{ url_for('mock_tests') }}">
+                <i class="fa-solid fa-file-circle-check"></i>
+                <span>Mock Tests</span>
+            </a>
+            <a href="{{ url_for('activity_points') }}">
+                <i class="fa-solid fa-award"></i>
+                <span>Activity Points</span>
+            </a>
+            <a href="{{ url_for('internships') }}">
+                <i class="fa-solid fa-briefcase"></i>
+                <span>Internships</span>
+            </a>
+            <a href="{{ url_for('nptel') }}">
+                <i class="fa-solid fa-laptop-code"></i>
+                <span>NPTEL Courses</span>
+            </a>
+            <a class="active" href="{{ url_for('ai_tutor_page') }}">
+                <i class="fa-solid fa-brain"></i>
+                <span>AI Study Buddy</span>
+            </a>
+            <a href="{{ url_for('admin_panel') }}">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Admin Panel</span>
+            </a>
+            <a href="{{ url_for('profile') }}">
+                <i class="fa-solid fa-user-gear"></i>
+                <span>My Profile</span>
+            </a>
+        </nav>
+        <div class="sidebar-bottom">
+            <a href="{{ url_for('logout') }}" class="logout">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <button class="mobile-menu" id="mobileMenuBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeBtn" title="Toggle Dark/Light Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <a href="{{ url_for('profile') }}" class="profile-mini">
+                    <div class="avatar">{{ user["avatar"] }}</div>
+                    <div>
+                        <div class="p-name">{{ user["name"] }}</div>
+                        <div class="p-role">{{ user["branch_code"] }} • Sem {{ user["current_sem"] }}</div>
+                    </div>
+                </a>
+            </div>
+        </header>
+
+        <section class="content">
+            <div class="chat-container">
+                <!-- CHAT HEADER -->
+                <div class="chat-header">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--primary), #6366f1); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px;">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 800; font-size: 16px; color: var(--text);">EduSpark AI Study Buddy</div>
+                            <div style="font-size: 12px; color: #10b981; font-weight: 600;">
+                                <i class="fa-solid fa-circle" style="font-size: 8px;"></i> Online • VTU CBCS Knowledge Base
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SELECT COURSE CONTEXT -->
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <select id="courseContext" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 13px;">
+                            <option value="">General Engineering</option>
+                            {% for c in courses %}
+                            <option value="{{ c['id'] }}">{{ c['course_code'] }} - {{ c['course_name'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CHAT MESSAGES -->
+                <div class="chat-messages" id="chatBox">
+                    <div class="msg msg-ai">
+                        <h4 style="margin-bottom: 6px; color: var(--primary);">👋 Hello, {{ user['name'] }}!</h4>
+                        <p>I am your <b>EduSpark AI Study Buddy</b>, specialized in Visvesvaraya Technological University (VTU) curriculum for <b>{{ user['branch_code'] }}</b>.</p>
+                        <p style="margin-top: 6px;">Ask me anything: difficult algorithms, real-life analogies, step-by-step derivations, or repeated VTU 10-mark exam questions!</p>
+                    </div>
+                </div>
+
+                <!-- QUICK CHIPS -->
+                <div style="padding: 0 24px;">
+                    <div class="quick-chips">
+                        <span class="chip" onclick="askChip('Explain Decision Tree with Entropy and Information Gain')">🌳 Decision Trees & Entropy</span>
+                        <span class="chip" onclick="askChip('What is Backpropagation in Neural Networks?')">⚡ Backpropagation</span>
+                        <span class="chip" onclick="askChip('Explain HDFS Read and Write architecture in Big Data')">📦 Big Data HDFS</span>
+                        <span class="chip" onclick="askChip('Explain CPU Process Scheduling & Round Robin')">💻 OS CPU Scheduling</span>
+                        <span class="chip" onclick="askChip('What is Database Normalization 3NF vs BCNF?')">🗄️ DBMS Normalization</span>
+                    </div>
+                </div>
+
+                <!-- INPUT BAR -->
+                <div class="chat-input-bar">
+                    <input type="text" id="userInput" class="chat-input" placeholder="Ask your VTU engineering query..." onkeypress="handleKey(event)">
+                    <button class="btn btn-primary" onclick="sendMessage()" style="border-radius: 999px; padding: 12px 22px;">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function applyTheme(theme) {
+            if (theme === "dark") {
+                document.documentElement.setAttribute("data-theme", "dark");
+                document.body.classList.add("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+            } else {
+                document.documentElement.setAttribute("data-theme", "light");
+                document.body.classList.remove("dark-theme");
+                const btn = document.getElementById("themeBtn");
+                if (btn) btn.innerHTML = `<i class="fa-solid fa-moon"></i>`;
+            }
+        }
+        applyTheme(localStorage.getItem("eduspark_theme") || "light");
+        const themeBtn = document.getElementById("themeBtn");
+        if (themeBtn) {
+            themeBtn.addEventListener("click", () => {
+                const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+                const next = isDark ? "light" : "dark";
+                applyTheme(next);
+                localStorage.setItem("eduspark_theme", next);
+            });
+        }
+
+        function handleKey(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function askChip(text) {
+            document.getElementById('userInput').value = text;
+            sendMessage();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const q = input.value.trim();
+            if (!q) return;
+
+            const courseId = document.getElementById('courseContext').value;
+            const chatBox = document.getElementById('chatBox');
+
+            // Append user message
+            const uDiv = document.createElement('div');
+            uDiv.className = 'msg msg-user';
+            uDiv.textContent = q;
+            chatBox.appendChild(uDiv);
+            input.value = '';
+
+            // Append loading indicator
+            const loadDiv = document.createElement('div');
+            loadDiv.className = 'msg msg-ai';
+            loadDiv.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing VTU curriculum & generating simplified breakdown...`;
+            chatBox.appendChild(loadDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const res = await fetch('/api/ask', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ question: q, course_id: courseId })
+                });
+                const data = await res.json();
+                loadDiv.innerHTML = data.answer;
+            } catch (err) {
+                loadDiv.innerHTML = `<p style="color: #dc2626;">Failed to connect to AI study service.</p>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
